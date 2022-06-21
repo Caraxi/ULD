@@ -9,7 +9,7 @@ public class ImageNode : ResNode {
     public byte Wrap;
     public byte Unk3;
 
-    protected override ushort Size => (ushort)(base.Size + 12);
+    public override long Size => base.Size + 12;
 
     public override byte[] Encode() {
         var b = new BufferWriter();

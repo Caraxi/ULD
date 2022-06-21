@@ -15,7 +15,7 @@ public class CollisionNode : ResNode {
     public int CollisionY;
     public uint Radius;
 
-    protected override ushort Size => (ushort)(base.Size + 16);
+    public override long Size => base.Size + 16;
 
     public override byte[] Encode() {
         var b = new BufferWriter();

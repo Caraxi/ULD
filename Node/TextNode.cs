@@ -37,7 +37,7 @@ public class TextNode : ResNode {
 
     public uint Unk2;
 
-    protected override ushort Size => (ushort) (base.Size + 24);
+    public override long Size => base.Size + 24;
 
     public override byte[] Encode() {
         var b = new BufferWriter();

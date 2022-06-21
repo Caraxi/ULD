@@ -17,24 +17,34 @@ public abstract class ListHeader<T> : Header where T : IEncodeable, new() {
     
     
     protected ListHeader(ULD baseUld, BufferReader r, string headerType) : base(baseUld, r, headerType) {
-        Decode(baseUld, r);
+        
     }
 
+    protected virtual T CreateElementObject(ULD baseUld, BufferReader r) {
+        return new T();
+    }
+    
     public void Decode(ULD baseUld, BufferReader r) {
+        
+        Logging.IndentLog($"Decoding {GetType().Name} @ {r.BaseStream.Position}");
+        
         var elementCount = r.ReadUInt32();
         Unknown = r.ReadInt32();
 
         for (var i = 0; i < elementCount; i++) {
             var pos = r.BaseStream.Position;
-            var t = new T();
-            t.Decode(baseUld, r);
+            var t = CreateElementObject(baseUld, r);
             Elements.Add(t);
+            t.Decode(baseUld, r);
             var offset = NextOffset(t);
             if (offset > 0) {
                 r.Seek(pos + offset);
             }
             
         }
+        
+        
+        Logging.Unindent();
     }
     
 

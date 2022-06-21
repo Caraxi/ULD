@@ -15,11 +15,16 @@ public class ATK : Header {
     
     public ATK(ULD uld, BufferReader r) : base(uld, r, "atkh") {
         
+    }
+
+    public void Decode(ULD uld, BufferReader r) {
+        Logging.IndentLog($"Decoding ATK @ {r.BaseStream.Position}");
         var assetListOffset = r.ReadUInt32();
         if (assetListOffset != 0) {
             r.Push();
             r.Seek(BaseOffset + assetListOffset);
             Assets = new AssetList(uld, r);
+            Assets.Decode(uld, r);
             r.Pop();
         }
 
@@ -28,6 +33,7 @@ public class ATK : Header {
             r.Push();
             r.Seek(BaseOffset + partListOffset);
             Parts = new PartList(uld, r);
+            Parts.Decode(uld, r);
             r.Pop();
         }
         
@@ -36,6 +42,7 @@ public class ATK : Header {
             r.Push();
             r.Seek(BaseOffset + componentListOffset);
             Components = new ComponentList(uld, r);
+            Components.Decode(uld, r);
             r.Pop();
         }
 
@@ -45,6 +52,7 @@ public class ATK : Header {
             r.Push();
             r.Seek(BaseOffset + timelineListOffset);
             Timelines = new TimelineList(uld, r);
+            Timelines.Decode(uld, r);
             r.Pop();
         }
         
@@ -54,6 +62,7 @@ public class ATK : Header {
             r.Push();
             r.Seek(BaseOffset + WidgetOffset);
             Widget = new WidgetList(uld, r);
+            Widget.Decode(uld, r);
             r.Pop();
         }
         
@@ -62,11 +71,12 @@ public class ATK : Header {
         if ((Timelines == null && TimelineListSize != 0) || (Timelines != null && TimelineListSize != Timelines.ElementCount)) {
             throw new Exception("Timeline list size mismatch");
         }
-        
     }
-
+    
+    
     public byte[] Encode() {
         var bytes = new BufferWriter();
+        Logging.IndentLog("Encoding ATK");
         
         bytes.Write("atkh");
         bytes.Write("0100");
@@ -113,6 +123,8 @@ public class ATK : Header {
         
         
         bytes.Write(data);
+        
+        Logging.Unindent();
         
         return bytes.ToArray();
     }

@@ -1,3 +1,5 @@
+using ULD.Timelines;
+
 namespace ULD;
 
 public class TimelineList : ListHeader<Timeline> {
@@ -6,6 +8,6 @@ public class TimelineList : ListHeader<Timeline> {
     protected override string HeaderType => "tlhd";
 
     protected override long NextOffset(Timeline element) {
-        return element.Offset;
+        return element.Size;
     }
 }

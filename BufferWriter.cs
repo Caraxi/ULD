@@ -26,7 +26,7 @@ public class BufferWriter {
     
     
     public void Write(string value) => data.AddRange(Encoding.UTF8.GetBytes(value));
-    public void Write(bool value) => data.Add((byte)(value ? 0 : 1));
+    public void Write(bool value) => data.Add((byte)(value ? 1 : 0));
     
     public void Write(BufferWriter o) => data.AddRange(o.data);
     public void Write(IEnumerable<uint> value) {

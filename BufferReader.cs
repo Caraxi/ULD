@@ -17,7 +17,7 @@ public class BufferReader : BinaryReader {
     }
 
 
-    public int PeekUInt16(long relativeOffset) {
+    public ushort PeekUInt16(long relativeOffset) {
         Push();
         this.BaseStream.Position += relativeOffset;
         var v = ReadUInt16();
@@ -32,6 +32,26 @@ public class BufferReader : BinaryReader {
         Pop();
         return v;
     }
+
+    public byte PeekByte(long relativeOffset) {
+        Push();
+        this.BaseStream.Position += relativeOffset;
+        var v = ReadByte();
+        Pop();
+        return v;
+    }
+
+
+    public uint[] ReadUInt32(int count) {
+        var ret = new uint[count];
+        for(var i = 0; i < count; i++) {
+            ret[i] = ReadUInt32();
+        }
+        return ret;
+    }
+    
+    
+    
 
     public void Seek(long offset) => this.BaseStream.Position = offset;
     

@@ -25,7 +25,7 @@ public class NineGridNode : ResNode {
     public byte Unk3;
     public byte Unk4;
 
-    protected override ushort Size => (ushort)(base.Size + 20);
+    public override long Size => base.Size + 20;
 
     public override byte[] Encode() {
         var b = new BufferWriter();

@@ -57,7 +57,7 @@ public class ResNode : IEncodeable {
 
     public ushort TimelineId;
 
-    protected virtual ushort Size => 88;
+    public virtual long Size => 88;
     
     public virtual byte[] Encode() {
         var b = new BufferWriter();
@@ -67,7 +67,8 @@ public class ResNode : IEncodeable {
         b.Write(PrevSiblingId);
         b.Write(ChildNodeId);
         b.Write((int)Type);
-        b.Write(Size);
+        if (Size > ushort.MaxValue) throw new Exception("Node is too large to encode");
+        b.Write((ushort)Size);
         b.Write(TabIndex);
         b.Write(Unk1);
         b.Write(X);
@@ -102,11 +103,11 @@ public class ResNode : IEncodeable {
         b.Write(Alpha);
         b.Write(ClipCount);
         b.Write(TimelineId);
-        
         return b;
     }
 
     public virtual void Decode(ULD baseUld, BufferReader reader) {
+        Logging.IndentLog($"Decoding {GetType()}");
         NodeId = reader.ReadUInt32();
         ParentId = reader.ReadInt32();
         NextSiblingId = reader.ReadInt32();
@@ -150,14 +151,18 @@ public class ResNode : IEncodeable {
         Alpha = reader.ReadByte();
         ClipCount = reader.ReadByte();
         TimelineId = reader.ReadUInt16();
+        Logging.Unindent();
     }
 
     public static ResNode ReadNode(ULD baseUld, BufferReader reader) {
+        
         var pos = reader.BaseStream.Position;
         
         // peek type
         var nodeType = (NodeType) reader.PeekInt32(20);
         var size = reader.PeekUInt16(24);
+        
+        Logging.Log($"Reading {nodeType} Node @ {reader.BaseStream.Position}");
         
         var node = nodeType switch {
             NodeType.Res => new ResNode(),

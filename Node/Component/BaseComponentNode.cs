@@ -1,3 +1,5 @@
+using ULD.Component;
+
 namespace ULD.Node.Component; 
 
 public class BaseComponentNode : ResNode {
@@ -20,7 +22,7 @@ public class BaseComponentNode : ResNode {
     public short OffsetX;
     public short OffsetY;
 
-    protected override ushort Size => (ushort) (base.Size + 12);
+    public override long Size => base.Size + 12;
 
     public override void Decode(ULD baseUld, BufferReader reader) {
         base.Decode(baseUld, reader);
@@ -141,5 +143,3 @@ public class GaugeComponentNode : BaseComponentNode { }
 public class RadioButtonComponentNode : BaseComponentNode { }
 
 public class CheckBoxComponentNode : BaseComponentNode { }
-
-public class ButtonComponentNode : BaseComponentNode { }

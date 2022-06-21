@@ -8,7 +8,7 @@ public class WindowComponentNode : BaseComponentNode {
     public bool HelpButton;
     public bool Header;
 
-    protected override ushort Size => (ushort) (base.Size + 12);
+    public override long Size => base.Size + 12;
 
     public override void Decode(ULD baseUld, BufferReader reader) {
         base.Decode(baseUld, reader);
