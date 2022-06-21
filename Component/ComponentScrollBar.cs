@@ -1,7 +1,7 @@
 namespace ULD.Component; 
 
 public class ComponentScrollBar : ComponentBase {
-    protected override long Size => base.Size + 20;
+    public override long Size => base.Size + 20;
 
     public uint[] Data = new uint[4];
 

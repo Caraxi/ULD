@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace ULD;
 
 public abstract class ListHeader<T> : Header where T : IEncodeable, new() {
@@ -5,7 +7,8 @@ public abstract class ListHeader<T> : Header where T : IEncodeable, new() {
     public int Unknown;
 
     public List<T> Elements = new();
-
+    
+    [JsonIgnore]
     public uint ElementCount => (uint)Elements.Count;
 
     public override bool ShouldEncode() => Elements.Count > 0;

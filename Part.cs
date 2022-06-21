@@ -6,6 +6,8 @@ public class Part : IEncodeable {
     public ushort V;
     public ushort W;
     public ushort H;
+
+    public long Size => 12;
     
     public byte[] Encode() {
         var data = new BufferWriter();

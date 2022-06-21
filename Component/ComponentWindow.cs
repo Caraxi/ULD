@@ -1,7 +1,7 @@
 namespace ULD.Component; 
 
 public class ComponentWindow : ComponentBase {
-    protected override long Size => base.Size + 32;
+    public override long Size => base.Size + 32;
 
     public uint[] Data = new uint[8];
 

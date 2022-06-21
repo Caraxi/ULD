@@ -41,7 +41,7 @@ public class ComponentBase : IEncodeable {
 
     public List<ResNode> Nodes = new();
 
-    protected virtual long Size => 16;
+    public virtual long Size => 16;
     public long TotalSize => Size + Nodes.Sum(n => n.Size);
     
     protected virtual void EncodeData(BufferWriter writer) {}

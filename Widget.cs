@@ -9,8 +9,7 @@ public class Widget : IEncodeable {
     public short X;
     public short Y;
     public ushort NodeCount;
-    public ushort Offset; // TODO: Calculate it
-
+    public long Size => 16 + Nodes.Sum(n => n.Size);
     public List<ResNode> Nodes = new();
 
 
@@ -29,8 +28,7 @@ public class Widget : IEncodeable {
         
         if (nodeData.Length + 16 > ushort.MaxValue) throw new Exception("Widget is too big");
         
-        
-        b.Write((ushort) (16 + nodeData.Length));
+        b.Write((ushort)Size);
         b.Write(nodeData);
         
         return b.ToArray();
@@ -42,12 +40,14 @@ public class Widget : IEncodeable {
         X = reader.ReadInt16();
         Y = reader.ReadInt16();
         var nodeCount = reader.ReadUInt16();
-        Offset = reader.ReadUInt16();
+        var size = reader.ReadUInt16();
         Nodes = new List<ResNode>();
 
         for (var i = 0; i < nodeCount; i++) {
             var node = ResNode.ReadNode(baseUld, reader);
             Nodes.Add(node);
         }
+
+        if (Size != size) throw new Exception("Widget size mismatch. Expected " + size + " but got " + Size);
     }
 }

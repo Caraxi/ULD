@@ -1,7 +1,7 @@
 namespace ULD.Component;
 
 public class ComponentButton : ComponentBase {
-    protected override long Size => base.Size + 8;
+    public override long Size => base.Size + 8;
 
     public uint[] Data = new uint[2];
     

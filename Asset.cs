@@ -5,10 +5,12 @@ namespace ULD;
 public class Asset : IEncodeable {
     
     public uint Id;
-    public string Path;
+    public string Path = string.Empty;
     public uint Unk1;
     public uint Unk2;
-    
+
+    public long Size => 56;
+
     public byte[] Encode() {
         var data = new BufferWriter();
         data.Write(Id);

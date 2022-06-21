@@ -8,6 +8,6 @@ public class PartList : ListHeader<Parts> {
     protected override string HeaderType => "tphd";
 
     protected override long NextOffset(Parts element) {
-        return element.Offset;
+        return element.Size;
     }
 }
