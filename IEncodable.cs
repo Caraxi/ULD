@@ -1,6 +1,6 @@
 namespace ULD; 
 
-public interface IEncodeable {
+public interface IEncodable {
     public byte[] Encode();
     public void Decode(ULD baseUld, BufferReader reader);
     

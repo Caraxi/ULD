@@ -2,7 +2,7 @@ using ULD.Node;
 
 namespace ULD.Component;
 
-public class ComponentBase : IEncodeable {
+public class ComponentBase : IEncodable {
 
     private bool nodeListDecoded = true;
     private uint encodedNodeListCount = 0;

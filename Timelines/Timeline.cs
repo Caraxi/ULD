@@ -1,6 +1,6 @@
 namespace ULD.Timelines;
 
-public class Timeline : IEncodeable {
+public class Timeline : IEncodable {
 
     public uint Id;
 

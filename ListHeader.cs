@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace ULD;
 
-public abstract class ListHeader<T> : Header, IEncodeable where T : IEncodeable, new() {
+public abstract class ListHeader<T> : Header, IEncodable where T : IEncodable, new() {
 
     public int Unknown;
 

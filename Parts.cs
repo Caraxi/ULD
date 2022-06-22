@@ -1,6 +1,6 @@
 namespace ULD;
 
-public class Parts : IEncodeable {
+public class Parts : IEncodable {
     public uint Id;
     public List<Part> SubParts = new();
 

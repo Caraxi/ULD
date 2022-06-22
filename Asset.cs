@@ -2,7 +2,7 @@ using System.Text;
 
 namespace ULD;
 
-public class Asset : IEncodeable {
+public class Asset : IEncodable {
     
     public uint Id;
     public string Path = string.Empty;

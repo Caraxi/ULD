@@ -2,7 +2,7 @@ using ULD.Timelines.Keyframe;
 
 namespace ULD.Timelines;
 
-public class KeyGroup : IEncodeable {
+public class KeyGroup : IEncodable {
     
     public enum KeyGroupType : ushort
     {

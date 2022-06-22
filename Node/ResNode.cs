@@ -14,7 +14,7 @@ public enum NodeType
     // Component: >=1000
 }
 
-public class ResNode : IEncodeable {
+public class ResNode : IEncodable {
     public uint NodeId;
     public int ParentId;
     public int NextSiblingId;

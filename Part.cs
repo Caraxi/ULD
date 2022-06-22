@@ -1,6 +1,6 @@
 namespace ULD;
 
-public class Part : IEncodeable {
+public class Part : IEncodable {
     public uint TextureId;
     public ushort U;
     public ushort V;

@@ -1,6 +1,6 @@
 namespace ULD.Timelines;
 
-public class Frame : IEncodeable {
+public class Frame : IEncodable {
 
     public uint StartFrame;
     public uint EndFrame;

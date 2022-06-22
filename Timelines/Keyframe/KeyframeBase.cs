@@ -1,6 +1,6 @@
 namespace ULD.Timelines.Keyframe;
 
-public abstract class KeyframeBase : IEncodeable {
+public abstract class KeyframeBase : IEncodable {
     public uint Time;
     public ushort Offset;
     public byte Interpolation;

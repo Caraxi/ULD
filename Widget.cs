@@ -2,7 +2,7 @@ using ULD.Node;
 
 namespace ULD;
 
-public class Widget : IEncodeable {
+public class Widget : IEncodable {
 
     public uint Id;
     public AlignmentType AlignmentType;
