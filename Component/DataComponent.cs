@@ -1,2 +1,0 @@
-namespace ULD.Component;
-

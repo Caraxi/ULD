@@ -162,7 +162,7 @@ public class ResNode : IEncodeable {
         var nodeType = (NodeType) reader.PeekInt32(20);
         var size = reader.PeekUInt16(24);
         
-        Logging.Log($"Reading {nodeType} Node @ {reader.BaseStream.Position}");
+        Logging.IndentLog($"Reading {nodeType} Node @ {reader.BaseStream.Position}");
         
         var node = nodeType switch {
             NodeType.Res => new ResNode(),
@@ -170,6 +170,7 @@ public class ResNode : IEncodeable {
             NodeType.Image => new ImageNode(),
             NodeType.Collision => new CollisionNode(),
             NodeType.NineGrid => new NineGridNode(),
+            NodeType.Counter => new CounterNode(),
             > (NodeType)1000 => BaseComponentNode.Create(baseUld, (uint) nodeType),
             _ => new ResNode()
         };
@@ -183,6 +184,7 @@ public class ResNode : IEncodeable {
         if (size > 0) {
             reader.Seek(pos + size);
         }
+        Logging.Unindent();
         
         return node;
     }

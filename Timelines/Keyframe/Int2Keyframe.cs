@@ -3,6 +3,8 @@ namespace ULD.Timelines.Keyframe;
 public class Int2Keyframe : KeyframeBase {
     public int[] Value = new int[2];
     
+    public override long Size => BaseSize + 8;
+    
     protected override void EncodeKeyframeData(BufferWriter b) {
         b.Write(Value[0]);
         b.Write(Value[1]);

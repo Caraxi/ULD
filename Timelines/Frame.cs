@@ -22,6 +22,7 @@ public class Frame : IEncodeable {
     }
 
     public void Decode(ULD baseUld, BufferReader reader) {
+        Logging.IndentLog("Decoding Frame");
         StartFrame = reader.ReadUInt32();
         EndFrame = reader.ReadUInt32();
         var size = reader.ReadUInt32();
@@ -34,5 +35,6 @@ public class Frame : IEncodeable {
             KeyGroups.Add(k);
         }
         if (size != Size) throw new Exception("Frame size value mismatch. Expected: " + Size + " Actual: " + size);
+        Logging.Unindent();
     }
 }

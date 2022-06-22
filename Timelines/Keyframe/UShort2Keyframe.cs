@@ -3,6 +3,8 @@ namespace ULD.Timelines.Keyframe;
 public class UShort2Keyframe : KeyframeBase {
     public ushort[] Value = new ushort[2];
     
+    public override long Size => BaseSize + 4;
+    
     protected override void EncodeKeyframeData(BufferWriter b) {
         b.Write(Value[0]);
         b.Write(Value[1]);

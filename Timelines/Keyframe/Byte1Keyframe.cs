@@ -1,7 +1,7 @@
 namespace ULD.Timelines.Keyframe;
 
 public class Byte1Keyframe : KeyframeBase {
-    public override long Size => base.Size + 4;
+    public override long Size => BaseSize + 4;
 
     public byte Value;
     
@@ -16,5 +16,6 @@ public class Byte1Keyframe : KeyframeBase {
 
     protected override void DecodeKeyframeData(BufferReader reader) {
         Value = reader.ReadByte();
+        reader.ReadBytes(3); // Padding
     }
 }

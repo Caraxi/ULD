@@ -33,6 +33,14 @@ public class BufferReader : BinaryReader {
         return v;
     }
 
+    public uint PeekUInt32(long relativeOffset) {
+        Push();
+        this.BaseStream.Position += relativeOffset;
+        var v = ReadUInt32();
+        Pop();
+        return v;
+    }
+
     public byte PeekByte(long relativeOffset) {
         Push();
         this.BaseStream.Position += relativeOffset;

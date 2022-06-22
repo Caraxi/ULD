@@ -3,7 +3,9 @@ namespace ULD.Timelines.Keyframe;
 public class Bool2Keyframe : KeyframeBase {
 
     public bool[] Value = new bool[2];
-    
+
+    public override long Size => BaseSize + 2;
+
     protected override void EncodeKeyframeData(BufferWriter b) {
         b.Write(Value[0]);
         b.Write(Value[1]);

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace ULD;
 
-public abstract class ListHeader<T> : Header where T : IEncodeable, new() {
+public abstract class ListHeader<T> : Header, IEncodeable where T : IEncodeable, new() {
 
     public int Unknown;
 
@@ -18,7 +18,8 @@ public abstract class ListHeader<T> : Header where T : IEncodeable, new() {
 
     protected virtual long NextOffset(T element) { return 0; }
     
-    
+    protected ListHeader(string name) : base(name) { }
+
     protected ListHeader(ULD baseUld, BufferReader r, string headerType) : base(baseUld, r, headerType) {
         
     }
@@ -29,9 +30,10 @@ public abstract class ListHeader<T> : Header where T : IEncodeable, new() {
     
     public void Decode(ULD baseUld, BufferReader r) {
         
-        Logging.IndentLog($"Decoding {GetType().Name} @ {r.BaseStream.Position}");
+        Logging.IndentLog($"Decoding {GetType().Name} @ {BaseOffset}");
         
         var elementCount = r.ReadUInt32();
+        Logging.Log($" - Elements: {elementCount}");
         Unknown = r.ReadInt32();
 
         for (var i = 0; i < elementCount; i++) {
@@ -43,12 +45,15 @@ public abstract class ListHeader<T> : Header where T : IEncodeable, new() {
             if (offset > 0) {
                 r.Seek(pos + offset);
             }
-            
         }
         
-        
+        AfterDecode(baseUld, r);
         Logging.Unindent();
     }
+
+    public virtual long Size => Elements.Sum(e => e.Size);
+
+    protected virtual void AfterDecode(ULD baseUld, BufferReader reader) {}
     
 
     public byte[] Encode() {

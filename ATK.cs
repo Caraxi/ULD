@@ -12,7 +12,11 @@ public class ATK : Header {
     public uint WidgetOffset;
     public uint RewriteDataOffset;
     public uint TimelineListSize;
-    
+
+    public ATK() : base("atkh") {
+        
+    }
+
     public ATK(ULD uld, BufferReader r) : base(uld, r, "atkh") {
         
     }
@@ -68,9 +72,7 @@ public class ATK : Header {
         
         RewriteDataOffset = r.ReadUInt32();
         TimelineListSize = r.ReadUInt32();
-        if ((Timelines == null && TimelineListSize != 0) || (Timelines != null && TimelineListSize != Timelines.ElementCount)) {
-            throw new Exception("Timeline list size mismatch");
-        }
+        // TODO: Validate Timeline List Size?
     }
     
     
@@ -118,8 +120,8 @@ public class ATK : Header {
             bytes.Write(0U);
         }
         
-        bytes.Write(0U); // Rewrite Data Offset
-        bytes.Write((uint)(Timelines?.Elements?.Count ?? 0));
+        bytes.Write(RewriteDataOffset); // TODO: work out wtf this is
+        bytes.Write(TimelineListSize); // TODO: work out wtf this really is. 
         
         
         bytes.Write(data);

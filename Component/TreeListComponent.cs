@@ -1,5 +1,5 @@
 namespace ULD.Component;
 
-public class TreeListComponent : ComponentBase {
+public class TreeListComponent : ListComponent {
     protected override int DataCount => 5;
 }

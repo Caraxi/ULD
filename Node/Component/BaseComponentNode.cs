@@ -123,21 +123,3 @@ public class TreeListComponentNode : BaseComponentNode { }
 public class DropDownListComponentNode : BaseComponentNode { }
 
 public class ScrollBarComponentNode : BaseComponentNode { }
-
-public class TextNineGridComponentNode : BaseComponentNode { }
-
-public class ListItemComponentNode : BaseComponentNode { }
-
-public class TabComponentNode : BaseComponentNode { }
-
-public class ListComponentNode : BaseComponentNode { }
-
-public class NumericInputComponentNode : BaseComponentNode { }
-
-public class TextInputComponentNode : BaseComponentNode { }
-
-public class SliderComponentNode : BaseComponentNode { }
-
-public class GaugeComponentNode : BaseComponentNode { }
-
-public class RadioButtonComponentNode : BaseComponentNode { }

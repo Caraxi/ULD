@@ -1,6 +1,6 @@
 namespace ULD.Node.Component;
 
-public class ButtonComponentNode : BaseComponentNode {
+public class TextNineGridComponentNode : BaseComponentNode {
     public uint TextId;
 
     public override long Size => base.Size + 4;
@@ -16,9 +16,4 @@ public class ButtonComponentNode : BaseComponentNode {
         b.Write(TextId);
         return b;
     }
-    
 }
-
-public class CheckBoxComponentNode : ButtonComponentNode { }
-
-

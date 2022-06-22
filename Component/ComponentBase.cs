@@ -4,6 +4,13 @@ namespace ULD.Component;
 
 public class ComponentBase : IEncodeable {
 
+    private bool nodeListDecoded = true;
+    private uint encodedNodeListCount = 0;
+    private ushort encodedTotalSize = 0;
+    private long encodedNodeListSize = 0;
+    private long encodedNodeListPosition = 0;
+    
+    
     protected virtual int DataCount => 0;
     
     public uint Id;
@@ -15,7 +22,7 @@ public class ComponentBase : IEncodeable {
     public List<ResNode> Nodes = new();
 
     public virtual long Size => 16 + DataCount * 4;
-    public long TotalSize => Size + Nodes.Sum(n => n.Size);
+    public long TotalSize => Size + (nodeListDecoded ? Nodes.Sum(n => n.Size) : encodedNodeListSize);
     
 
     private uint[]? data;
@@ -49,11 +56,13 @@ public class ComponentBase : IEncodeable {
         EncodeData(writer);
         
         foreach(var node in Nodes) {
+            var encodedNode = node.Encode();
+            if (encodedNode.Length != node.Size) throw new Exception($"{node.GetType().Name} does not match expected size of {node.Size}. Actual size: {encodedNode.Length}");
             writer.Write(node.Encode());
         }
 
         if (writer.Length != TotalSize) {
-            throw new Exception("Total Size does not match expected value. Expected: " + TotalSize + ", Actual: " + writer.Length);
+            throw new Exception($"{GetType().Name} does not match expected size. Expected: " + TotalSize + ", Actual: " + writer.Length);
         }
         
         return writer.ToArray();
@@ -64,6 +73,7 @@ public class ComponentBase : IEncodeable {
     }
     
     public void Decode(ULD baseUld, BufferReader br) {
+        nodeListDecoded = false;
         Logging.IndentLog($"Decoding {GetType().Name} @ {br.BaseStream.Position}");
         var pos = br.BaseStream.Position;
         Id = br.ReadUInt32();
@@ -73,10 +83,14 @@ public class ComponentBase : IEncodeable {
         DropArrow = br.ReadBoolean();
         Type = (ComponentType)br.ReadByte();
         Logging.Log($" - Type: {Type}");
-        var nodeCount = br.ReadUInt32();
+        encodedNodeListCount = br.ReadUInt32();
+        Logging.Log($" - Node Count: {encodedNodeListCount}");
 
-        var totalSize =  br.ReadUInt16();
+        encodedTotalSize = br.ReadUInt16();
+        Logging.Log($" - Total Size: {encodedTotalSize}");
         var dataSize = br.ReadUInt16();
+        Logging.Log($" - Data Size: {dataSize}");
+        encodedNodeListSize = encodedTotalSize - dataSize;
 
         if (dataSize != Size) throw new Exception($"{GetType().Name} Size does not match the expected value. Expected: {Size}, Actual: {dataSize}");
         
@@ -87,15 +101,23 @@ public class ComponentBase : IEncodeable {
         
         DecodeData(baseUld, br);
 
-        br.Seek(pos + dataSize); // We should already be here, but add some safety I guess
+        encodedNodeListPosition = br.BaseStream.Position;
         
-        
-        for (var i = 0; i < nodeCount; i++) {
-            Nodes.Add(ResNode.ReadNode(baseUld, br));
-        }
+        Logging.Unindent();
+    }
 
-        if (totalSize != TotalSize) throw new Exception($"{GetType().Name} Total Size does not match the expected value. Expected: {TotalSize}, Actual: {totalSize}");
+    public void DecodeNodeList(ULD baseUld, BufferReader reader) {
+        if (nodeListDecoded) return;
         
+        Logging.IndentLog($"Decoding Node List for {GetType().Name}#{Id} - {encodedNodeListCount} Nodes");
+        
+        reader.Seek(encodedNodeListPosition);
+        
+        for (var i = 0; i < encodedNodeListCount; i++) {
+            Nodes.Add(ResNode.ReadNode(baseUld, reader));
+        }
+        nodeListDecoded = true;
+        if (encodedTotalSize != TotalSize) throw new Exception($"{GetType().Name} Total Size does not match the expected value. Expected: {TotalSize}, Actual: {encodedTotalSize}");
         Logging.Unindent();
     }
 

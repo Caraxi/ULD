@@ -3,6 +3,8 @@ namespace ULD.Timelines.Keyframe;
 public class SByte2Keyframe : KeyframeBase {
     public sbyte[] Value = new sbyte[2];
     
+    public override long Size => BaseSize + 2;
+    
     protected override void EncodeKeyframeData(BufferWriter b) {
         b.Write(Value[0]);
         b.Write(Value[1]);

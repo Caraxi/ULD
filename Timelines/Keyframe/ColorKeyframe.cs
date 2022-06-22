@@ -1,7 +1,7 @@
 namespace ULD.Timelines.Keyframe;
 
 public class ColorKeyframe : KeyframeBase {
-    public override long Size => base.Size + 12;
+    public override long Size => BaseSize + 12;
 
     public short MultiplyRed;
     public short MultiplyGreen;

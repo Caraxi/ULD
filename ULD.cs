@@ -6,6 +6,17 @@ public class ULD : Header {
     public ATK? ATK2;
     
     public ULD(BufferReader r) : base(r, "uldh") {
+        Decode(r);
+    }
+
+    public ULD() : base("uldh") {
+        ATK = new ATK();
+        ATK2 = new ATK();
+    }
+    
+
+    public void Decode(BufferReader r) {
+        Logging.ZeroIndent();
         Logging.IndentLog($"Decoding ULD @ {r.BaseStream.Position}");
         var atkOffset = r.ReadUInt32();
         var atk2Offset = r.ReadUInt32();
@@ -29,6 +40,7 @@ public class ULD : Header {
         
         Logging.Unindent();
     }
+    
     
     public BufferWriter Encode() {
         Logging.ZeroIndent();

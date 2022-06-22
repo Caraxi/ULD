@@ -8,7 +8,8 @@ public abstract class KeyframeBase : IEncodeable {
     public float Acceleration;
     public float Deceleration;
 
-    public virtual long Size => 16;
+    public abstract long Size { get; }// => 16;
+    protected long BaseSize { get; } = 16;
     
     public byte[] Encode() {
         var b = new BufferWriter();

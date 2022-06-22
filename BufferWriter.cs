@@ -13,6 +13,8 @@ public class BufferWriter {
     
     public void Write(short value) => data.AddRange(BitConverter.GetBytes(value));
     public void Write(ushort value) => data.AddRange(BitConverter.GetBytes(value));
+
+    public void Write(char value) => data.AddRange(BitConverter.GetBytes(value));
     
     public void Write(int value) => data.AddRange(BitConverter.GetBytes(value));
     public void Write(uint value) => data.AddRange(BitConverter.GetBytes(value));
@@ -41,5 +43,9 @@ public class BufferWriter {
         foreach (var v in value) {
             Write(v);
         }
+    }
+
+    public void Write(IEnumerable<char> value) {
+        foreach(var v in value) Write(v);
     }
 }

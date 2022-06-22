@@ -1,7 +1,7 @@
 namespace ULD.Timelines.Keyframe;
 
 public class LabelKeyframe : KeyframeBase {
-    public override long Size => base.Size + 4;
+    public override long Size => BaseSize + 4;
 
     public ushort LabelId;
     public byte LabelCommand;
