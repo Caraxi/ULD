@@ -18,3 +18,6 @@ public class ButtonComponentNode : BaseComponentNode {
     }
     
 }
+
+public class CheckBoxComponentNode : ButtonComponentNode { }
+

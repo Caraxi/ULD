@@ -141,5 +141,3 @@ public class SliderComponentNode : BaseComponentNode { }
 public class GaugeComponentNode : BaseComponentNode { }
 
 public class RadioButtonComponentNode : BaseComponentNode { }
-
-public class CheckBoxComponentNode : BaseComponentNode { }
