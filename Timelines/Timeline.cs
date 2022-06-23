@@ -1,20 +1,21 @@
 namespace ULD.Timelines;
 
-public class Timeline : IEncodable {
+public class Timeline : IVersionedEncodable {
 
     public uint Id;
 
     public List<Frame> FrameSet0 = new();
     public List<Frame> FrameSet1 = new();
 
-    public long Size => 12 + FrameSet0.Sum(fs => fs.Size) + FrameSet1.Sum(fs => fs.Size);
+    public long GetSize(string version) => 12 + FrameSet0.Sum(fs => fs.Size) + FrameSet1.Sum(fs => fs.Size);
     
     
-    public byte[] Encode() {
+    public byte[] Encode(string version) {
         var data = new BufferWriter();
         data.Write(Id);
-        if (Size > uint.MaxValue) throw new Exception("Timeline is too large to encode");
-        data.Write((uint) Size);
+        var vSize = GetSize(version);
+        if (vSize > uint.MaxValue) throw new Exception("Timeline is too large to encode");
+        data.Write((uint) vSize);
         data.Write((ushort) FrameSet0.Count);
         data.Write((ushort) FrameSet1.Count);
         foreach (var f in FrameSet0) data.Write(f.Encode());
@@ -22,7 +23,7 @@ public class Timeline : IEncodable {
         return data.ToArray();
     }
 
-    public void Decode(ULD baseUld, BufferReader reader) {
+    public void Decode(ULD baseUld, BufferReader reader, string version) {
         Logging.IndentLog($"Decoding Timeline @ {reader.BaseStream.Position}");
         Id = reader.ReadUInt32();
         Logging.Log(" - ID: " + Id);
@@ -43,8 +44,9 @@ public class Timeline : IEncodable {
             frame.Decode(baseUld, reader);
             FrameSet1.Add(frame);
         }
-        
-        if (size != Size) throw new Exception("Timeline size value mismatch. Expected: " + Size + " Actual: " + size);
+
+        var vSize = GetSize(version);
+        if (size != vSize) throw new Exception("Timeline size value mismatch. Expected: " + vSize + " Actual: " + size);
         
         Logging.Unindent();
     }

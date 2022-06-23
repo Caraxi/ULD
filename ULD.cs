@@ -1,8 +1,16 @@
+using Newtonsoft.Json;
+using JsonSerializer = System.Text.Json.JsonSerializer;
+
 namespace ULD; 
 
+
+[JsonObject(MemberSerialization.OptIn)]
+
 public class ULD : Header {
-    
+    [JsonProperty]
     public ATK? ATK;
+    
+    [JsonProperty]
     public ATK? ATK2;
     
     public ULD(BufferReader r) : base(r, "uldh") {
@@ -13,8 +21,17 @@ public class ULD : Header {
         ATK = new ATK();
         ATK2 = new ATK();
     }
-    
 
+
+    public string ToJson(Formatting formatting = Formatting.Indented, JsonSerializerSettings? settings = null) {
+        settings ??= new JsonSerializerSettings() {
+            TypeNameHandling = TypeNameHandling.All,
+            TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple
+        };
+
+        return JsonConvert.SerializeObject(this, Formatting.Indented, settings);
+    }
+    
     public void Decode(BufferReader r) {
         Logging.ZeroIndent();
         Logging.IndentLog($"Decoding ULD @ {r.BaseStream.Position}");

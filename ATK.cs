@@ -1,16 +1,31 @@
+using Newtonsoft.Json;
+
 namespace ULD; 
 
+
+[JsonObject(MemberSerialization.OptIn)]
 public class ATK : Header {
+    
+    
+    [JsonProperty]
     public AssetList? Assets;
 
+    [JsonProperty]
     public PartList? Parts;
+    
+    [JsonProperty]
     public ComponentList? Components;
+    
+    [JsonProperty]
     public TimelineList? Timelines;
 
+    [JsonProperty]
     public WidgetList? Widget;
     
-    public uint WidgetOffset;
+    [JsonProperty]
     public uint RewriteDataOffset;
+    
+    [JsonProperty]
     public uint TimelineListSize;
 
     public ATK() : base("atkh") {
@@ -61,10 +76,10 @@ public class ATK : Header {
         }
         
 
-        WidgetOffset = r.ReadUInt32();
-        if (WidgetOffset != 0) {
+        var widgetOffset = r.ReadUInt32();
+        if (widgetOffset != 0) {
             r.Push();
-            r.Seek(BaseOffset + WidgetOffset);
+            r.Seek(BaseOffset + widgetOffset);
             Widget = new WidgetList(uld, r);
             Widget.Decode(uld, r);
             r.Pop();

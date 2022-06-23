@@ -3,7 +3,7 @@ namespace ULD.Component;
 public class SliderComponent : ComponentBase {
     protected override int DataCount => 4;
     
-    public override long Size => base.Size + 4;
+    public override long GetSize(string version) => base.GetSize(version) + 4;
 
     public bool IsVertical;
     public byte LeftOffset;

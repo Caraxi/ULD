@@ -3,7 +3,7 @@ namespace ULD.Component;
 public class TextInputComponent : ComponentBase {
     protected override int DataCount => 16;
     
-    public override long Size => base.Size + 12;
+    public override long GetSize(string version) => base.GetSize(version) + 12;
 
     public uint Color;
     public uint IMEColor;

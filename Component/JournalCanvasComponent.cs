@@ -4,7 +4,7 @@ public class JournalCanvasComponent : ComponentBase {
     protected override int DataCount => 32;
     
       
-    public override long Size => base.Size + 8;
+    public override long GetSize(string version) => base.GetSize(version) + 8;
 
     public ushort Margin;
     public ushort Unk1;

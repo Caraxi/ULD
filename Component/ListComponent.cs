@@ -7,7 +7,7 @@ public class ListComponent : ComponentBase {
     public byte[] Padding = new byte[2];
     
     protected override int DataCount => 5;
-    public override long Size => base.Size + 4;
+    public override long GetSize(string version) => base.GetSize(version) + 4;
 
     protected override void DecodeData(ULD baseUld, BufferReader br) {
         base.DecodeData(baseUld, br);

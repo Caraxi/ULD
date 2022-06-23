@@ -2,18 +2,18 @@ using ULD.Node;
 
 namespace ULD;
 
-public class Widget : IEncodable {
+public class Widget : IVersionedEncodable {
 
     public uint Id;
     public AlignmentType AlignmentType;
     public short X;
     public short Y;
     public ushort NodeCount;
-    public long Size => 16 + Nodes.Sum(n => n.Size);
+    public long GetSize(string version) => 16 + Nodes.Sum(n => n.Size);
     public List<ResNode> Nodes = new();
 
 
-    public byte[] Encode() {
+    public byte[] Encode(string version) {
         var b = new BufferWriter();
         b.Write(Id);
         b.Write((int)AlignmentType);
@@ -28,13 +28,13 @@ public class Widget : IEncodable {
         
         if (nodeData.Length + 16 > ushort.MaxValue) throw new Exception("Widget is too big");
         
-        b.Write((ushort)Size);
+        b.Write((ushort)GetSize(version));
         b.Write(nodeData);
         
         return b.ToArray();
     }
 
-    public void Decode(ULD baseUld, BufferReader reader) {
+    public void Decode(ULD baseUld, BufferReader reader, string version) {
         Id = reader.ReadUInt32();
         AlignmentType = (AlignmentType)reader.ReadInt32();
         X = reader.ReadInt16();
@@ -48,6 +48,7 @@ public class Widget : IEncodable {
             Nodes.Add(node);
         }
 
-        if (Size != size) throw new Exception("Widget size mismatch. Expected " + size + " but got " + Size);
+        var vSize = GetSize(version);
+        if (vSize != size) throw new Exception("Widget size mismatch. Expected " + size + " but got " + vSize);
     }
 }

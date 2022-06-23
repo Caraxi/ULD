@@ -4,7 +4,7 @@ public class NumericInputComponent : ComponentBase {
     protected override int DataCount => 5;
     
    
-    public override long Size => base.Size + 4;
+    public override long GetSize(string version) => base.GetSize(version) + 4;
 
     public uint Color;
 

@@ -2,7 +2,7 @@ using ULD.Node;
 
 namespace ULD.Component;
 
-public class ComponentBase : IEncodable {
+public class ComponentBase : IVersionedEncodable {
 
     private bool nodeListDecoded = true;
     private uint encodedNodeListCount = 0;
@@ -21,8 +21,8 @@ public class ComponentBase : IEncodable {
 
     public List<ResNode> Nodes = new();
 
-    public virtual long Size => 16 + DataCount * 4;
-    public long TotalSize => Size + (nodeListDecoded ? Nodes.Sum(n => n.Size) : encodedNodeListSize);
+    public virtual long GetSize(string version) => 16 + DataCount * 4;
+    public long GetTotalSize(string version) => GetSize(version) + (nodeListDecoded ? Nodes.Sum(n => n.Size) : encodedNodeListSize);
     
 
     private uint[]? data;
@@ -37,7 +37,7 @@ public class ComponentBase : IEncodable {
     
     protected virtual void EncodeData(BufferWriter writer) {}
     
-    public byte[] Encode() {
+    public byte[] Encode(string version) {
         var writer = new BufferWriter();
         
         writer.Write(Id);
@@ -46,12 +46,15 @@ public class ComponentBase : IEncodable {
         writer.Write(DropArrow);
         writer.Write((byte) Type);
         writer.Write((uint)Nodes.Count);
+
+        var vSize = GetSize(version);
+        var vTotalSize = GetTotalSize(version);
         
-        if (Size > ushort.MaxValue) throw new Exception("Component is too large");
-        if (TotalSize > ushort.MaxValue) throw new Exception("Component's Node List is too large");
+        if (vSize > ushort.MaxValue) throw new Exception("Component is too large");
+        if (vTotalSize > ushort.MaxValue) throw new Exception("Component's Node List is too large");
         
-        writer.Write((ushort)TotalSize);
-        writer.Write((ushort)Size);
+        writer.Write((ushort)vTotalSize);
+        writer.Write((ushort)vSize);
         foreach(var d in Data) writer.Write(d);
         EncodeData(writer);
         
@@ -61,8 +64,8 @@ public class ComponentBase : IEncodable {
             writer.Write(node.Encode());
         }
 
-        if (writer.Length != TotalSize) {
-            throw new Exception($"{GetType().Name} does not match expected size. Expected: " + TotalSize + ", Actual: " + writer.Length);
+        if (writer.Length != vTotalSize) {
+            throw new Exception($"{GetType().Name} does not match expected size. Expected: " + vTotalSize + ", Actual: " + writer.Length);
         }
         
         return writer.ToArray();
@@ -72,7 +75,7 @@ public class ComponentBase : IEncodable {
         
     }
     
-    public void Decode(ULD baseUld, BufferReader br) {
+    public void Decode(ULD baseUld, BufferReader br, string version) {
         nodeListDecoded = false;
         Logging.IndentLog($"Decoding {GetType().Name} @ {br.BaseStream.Position}");
         var pos = br.BaseStream.Position;
@@ -91,8 +94,8 @@ public class ComponentBase : IEncodable {
         var dataSize = br.ReadUInt16();
         Logging.Log($" - Data Size: {dataSize}");
         encodedNodeListSize = encodedTotalSize - dataSize;
-
-        if (dataSize != Size) throw new Exception($"{GetType().Name} Size does not match the expected value. Expected: {Size}, Actual: {dataSize}");
+        var vSize = GetSize(version);
+        if (dataSize != vSize) throw new Exception($"{GetType().Name} Size does not match the expected value. Expected: {vSize}, Actual: {dataSize}");
         
         Data = new uint[DataCount];
         for (var i = 0; i < DataCount; i++) {
@@ -106,7 +109,7 @@ public class ComponentBase : IEncodable {
         Logging.Unindent();
     }
 
-    public void DecodeNodeList(ULD baseUld, BufferReader reader) {
+    public void DecodeNodeList(ULD baseUld, BufferReader reader, string version) {
         if (nodeListDecoded) return;
         
         Logging.IndentLog($"Decoding Node List for {GetType().Name}#{Id} - {encodedNodeListCount} Nodes");
@@ -117,7 +120,8 @@ public class ComponentBase : IEncodable {
             Nodes.Add(ResNode.ReadNode(baseUld, reader));
         }
         nodeListDecoded = true;
-        if (encodedTotalSize != TotalSize) throw new Exception($"{GetType().Name} Total Size does not match the expected value. Expected: {TotalSize}, Actual: {encodedTotalSize}");
+        var totalSize = GetTotalSize(version);
+        if (encodedTotalSize != totalSize) throw new Exception($"{GetType().Name} Total Size does not match the expected value. Expected: {totalSize}, Actual: {encodedTotalSize}");
         Logging.Unindent();
     }
 

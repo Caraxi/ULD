@@ -24,7 +24,7 @@ public class TextInputComponentNode : BaseComponentNode {
     public byte Unk1;
     
     public ushort Charset;
-    public char[] CharsetExtras;
+    public byte[] CharsetExtras;
 
     public override long Size => base.Size + 36;
 
@@ -55,7 +55,7 @@ public class TextInputComponentNode : BaseComponentNode {
         Unk1 = (byte)(field & 0x07);
         
         Charset = reader.ReadUInt16();
-        CharsetExtras = reader.ReadChars(16);
+        CharsetExtras = reader.ReadBytes(16);
     }
 
     public override byte[] Encode() {

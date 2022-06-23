@@ -1,22 +1,33 @@
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace ULD;
 
-public abstract class ListHeader<T> : Header, IEncodable where T : IEncodable, new() {
 
+public interface IVersionedEncodable {
+    public byte[] Encode(string version);
+    public void Decode(ULD baseUld, BufferReader reader, string version);
+
+    public long GetSize(string version);
+}
+
+[JsonObject(MemberSerialization.OptIn)]
+public abstract class ListHeader<T> : Header, IEncodable where T : IVersionedEncodable, new() {
+
+    [JsonProperty]
     public int Unknown;
 
+    [JsonProperty]
     public List<T> Elements = new();
     
-    [JsonIgnore]
     public uint ElementCount => (uint)Elements.Count;
 
     public override bool ShouldEncode() => Elements.Count > 0;
 
     protected abstract string HeaderType { get; }
-    protected override string Version => "0100";
 
-    protected virtual long NextOffset(T element) { return 0; }
+    protected virtual long NextOffset(T element) {
+        return element.GetSize(Version);
+    }
     
     protected ListHeader(string name) : base(name) { }
 
@@ -40,7 +51,7 @@ public abstract class ListHeader<T> : Header, IEncodable where T : IEncodable, n
             var pos = r.BaseStream.Position;
             var t = CreateElementObject(baseUld, r);
             Elements.Add(t);
-            t.Decode(baseUld, r);
+            t.Decode(baseUld, r, Version);
             var offset = NextOffset(t);
             if (offset > 0) {
                 r.Seek(pos + offset);
@@ -51,7 +62,7 @@ public abstract class ListHeader<T> : Header, IEncodable where T : IEncodable, n
         Logging.Unindent();
     }
 
-    public virtual long Size => Elements.Sum(e => e.Size);
+    public virtual long Size => Elements.Sum(e => e.GetSize(Version));
 
     protected virtual void AfterDecode(ULD baseUld, BufferReader reader) {}
     
@@ -64,7 +75,7 @@ public abstract class ListHeader<T> : Header, IEncodable where T : IEncodable, n
         bytes.Write((uint) Unknown);
 
         foreach (var e in Elements) {
-            bytes.Write(e.Encode());
+            bytes.Write(e.Encode(Version));
         }
         
         return bytes.ToArray();

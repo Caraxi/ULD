@@ -3,7 +3,7 @@ namespace ULD.Component;
 public class GaugeBarComponent : ComponentBase {
     protected override int DataCount => 6;
     
-    public override long Size => base.Size + 8;
+    public override long GetSize(string version) => base.GetSize(version) + 8;
     
     public ushort VerticalMargin;
     public ushort HorizontalMargin;

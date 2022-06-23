@@ -12,7 +12,7 @@ public class ComponentList : ListHeader<ComponentBase> {
     protected override string HeaderType => "cohd";
 
     protected override long NextOffset(ComponentBase element) {
-        return element.TotalSize;
+        return element.GetTotalSize(Version);
     }
     
     
@@ -26,7 +26,7 @@ public class ComponentList : ListHeader<ComponentBase> {
         // Allow loading full component list before loading their respective node lists.
         r.Push();
         foreach (var c in Elements) {
-            c.DecodeNodeList(baseUld, r);
+            c.DecodeNodeList(baseUld, r, Version);
         }
         r.Pop();
         
