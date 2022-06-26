@@ -1,4 +1,3 @@
-using Newtonsoft.Json;
 using ULD.Node;
 
 namespace ULD.Component;
@@ -6,37 +5,20 @@ namespace ULD.Component;
 public class ComponentBase : ListElement {
 
     private bool nodeListDecoded = true;
-    private uint encodedNodeListCount = 0;
-    private ushort encodedTotalSize = 0;
-    private long encodedNodeListSize = 0;
-    private long encodedNodeListPosition = 0;
-    
-    
-    protected virtual int DataCount => 0;
-
+    private uint encodedNodeListCount;
+    private ushort encodedTotalSize;
+    private long encodedNodeListSize;
+    private long encodedNodeListPosition;
     
     public bool ShouldIgnoreInput;
     public bool DragArrow;
     public bool DropArrow;
     public ComponentType Type = ComponentType.Base;
-
-    // public List<ResNode> Nodes { get; set; } = new();
-
+    
     public ResNode? RootNode;
     
-    public override long GetSize(string version) => 16 + DataCount * 4;
+    public override long GetSize(string version) => 16;
     public long GetTotalSize(string version) => GetSize(version) + (nodeListDecoded ? ResNode.Collapse(RootNode).Sum(n => n.Size) : encodedNodeListSize);
-    
-
-    private uint[]? data;
-    public uint[] Data {
-        get => data ??= new uint[DataCount];
-        set {
-            if (value.Length != DataCount) throw new Exception($"Incorrect array size. Expected {DataCount}");
-            data = value;
-        }
-    }
-    
     
     protected virtual void EncodeData(BufferWriter writer) {}
     
@@ -61,7 +43,7 @@ public class ComponentBase : ListElement {
         
         writer.Write((ushort)vTotalSize);
         writer.Write((ushort)vSize);
-        foreach(var d in Data) writer.Write(d);
+
         EncodeData(writer);
         
         foreach(var node in nodes) {
@@ -103,11 +85,6 @@ public class ComponentBase : ListElement {
         var vSize = GetSize(version);
         if (dataSize != vSize) throw new Exception($"{GetType().Name} Size does not match the expected value. Expected: {vSize}, Actual: {dataSize}");
         
-        Data = new uint[DataCount];
-        for (var i = 0; i < DataCount; i++) {
-            Data[i] = br.ReadUInt32();
-        }
-        
         DecodeData(baseUld, br);
 
         encodedNodeListPosition = br.BaseStream.Position;
@@ -115,6 +92,10 @@ public class ComponentBase : ListElement {
         Logging.Unindent();
     }
 
+    protected virtual void DecodeNodeList(ULD baseUld, BufferReader reader, string version, List<ResNode> nodes) {
+        
+    }
+    
     public void DecodeNodeList(ULD baseUld, BufferReader reader, string version) {
         if (nodeListDecoded) return;
         
@@ -132,10 +113,17 @@ public class ComponentBase : ListElement {
         if (nodeList.Count(n => n.IsRootNode) != 1) throw new Exception($"{GetType().Name}#{Id} does not have exactly one root node");
         RootNode = ResNode.Expand(nodeList);
         
+        DecodeNodeList(baseUld, reader, version, nodeList);
+        
         nodeListDecoded = true;
         var totalSize = GetTotalSize(version);
         if (encodedTotalSize != totalSize) throw new Exception($"{GetType().Name} Total Size does not match the expected value. Expected: {totalSize}, Actual: {encodedTotalSize}");
+        
+        
+        
+        
         Logging.Unindent();
+
     }
 
 
