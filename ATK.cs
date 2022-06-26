@@ -1,4 +1,6 @@
 using Newtonsoft.Json;
+using ULD.Node;
+using ULD.Node.Component;
 
 namespace ULD; 
 
@@ -20,14 +22,14 @@ public class ATK : Header {
     public TimelineList? Timelines;
 
     [JsonProperty]
-    public WidgetList? Widget;
+    public WidgetList? Widgets;
     
     [JsonProperty]
     public uint RewriteDataOffset;
-    
-    [JsonProperty]
-    public uint TimelineListSize;
 
+    [JsonProperty] 
+    public uint NodesWithTimeline;
+    
     public ATK() : base("atkh") {
         
     }
@@ -80,18 +82,18 @@ public class ATK : Header {
         if (widgetOffset != 0) {
             r.Push();
             r.Seek(BaseOffset + widgetOffset);
-            Widget = new WidgetList(uld, r);
-            Widget.Decode(uld, r);
+            Widgets = new WidgetList(uld, r);
+            Widgets.Decode(uld, r);
             r.Pop();
         }
         
         RewriteDataOffset = r.ReadUInt32();
-        TimelineListSize = r.ReadUInt32();
+        NodesWithTimeline = r.ReadUInt32();
         // TODO: Validate Timeline List Size?
     }
     
     
-    public byte[] Encode() {
+    public byte[] Encode(ULD uld, byte id) {
         var bytes = new BufferWriter();
         Logging.IndentLog("Encoding ATK");
         
@@ -128,15 +130,33 @@ public class ATK : Header {
             bytes.Write(0U);
         }
 
-        if (Widget != null && Widget.ShouldEncode()) {
+        if (Widgets != null && Widgets.ShouldEncode()) {
             bytes.Write(36U + data.Length);
-            data.Write(Widget.Encode());
+            data.Write(Widgets.Encode());
         } else {
             bytes.Write(0U);
         }
         
         bytes.Write(RewriteDataOffset); // TODO: work out wtf this is
-        bytes.Write(TimelineListSize); // TODO: work out wtf this really is. 
+
+        /*
+        if (id == 0) {
+            var timelineListSize = 0U;
+            foreach (var a in uld.ATK) {
+                if (a?.Widgets != null) {
+                    foreach (var w in a.Widgets.Elements) {
+                        timelineListSize += CountNodesWithTimeline(uld, w.RootNode);
+                    }
+                }
+                
+            }
+            
+            bytes.Write(timelineListSize);
+        } else {
+            bytes.Write((uint) 0);
+        }
+        */
+        bytes.Write(NodesWithTimeline); // TODO: fix this
         
         
         bytes.Write(data);
@@ -145,5 +165,24 @@ public class ATK : Header {
         
         return bytes.ToArray();
     }
+
+    private uint CountNodesWithTimeline(ULD uld, ResNode? rootNode) {
+        if (rootNode == null) return 0U;
+        var n = 0U;
+        
+        n += CountNodesWithTimeline(uld, rootNode.Child);
+        n += CountNodesWithTimeline(uld, rootNode.NextSibling);
+
+        
+        if (rootNode is BaseComponentNode cNode) {
+            var component = uld.GetComponent(cNode.Type);
+            if (component != null) n += CountNodesWithTimeline(uld, component.RootNode);
+        } 
+        
+        if (rootNode.TimelineId > 0) n++;
+
+        return n;
+    }
+    
     
 }

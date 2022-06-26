@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using ULD.Node.Component;
 
 namespace ULD.Node; 
@@ -14,12 +15,85 @@ public enum NodeType
     // Component: >=1000
 }
 
-public class ResNode : IEncodable {
-    public uint NodeId;
-    public int ParentId;
-    public int NextSiblingId;
-    public int PrevSiblingId;
-    public int ChildNodeId;
+public class ResNode : IEncodable, IHasID {
+    
+    public uint Id { get; set; }
+    private uint parentId;
+    private uint nextSiblingId;
+    private uint prevSiblingId;
+    private uint childNodeId;
+
+    private void UpdateRelativeIds() {
+        parentId = Parent?.Id ?? 0;
+        nextSiblingId = NextSibling?.Id ?? 0;
+        prevSiblingId = PrevSibling?.Id ?? 0;
+        childNodeId = Child?.Id ?? 0;
+    }
+    
+    [JsonIgnore] 
+    public bool IsRootNode => parentId == 0;
+
+    
+    private ResNode? parent;
+    private ResNode? nextSibling;
+    private ResNode? prevSibling;
+    private ResNode? child;
+    
+    [JsonIgnore]
+    public ResNode? Parent {
+        get => parent;
+        set => parent = value;
+    }
+
+    [JsonIgnore]
+    public ResNode? NextSibling {
+        get => nextSibling;
+        set => nextSibling = value;
+    }
+    
+    [JsonIgnore]
+    public ResNode? PrevSibling {
+        get => prevSibling;
+        set => prevSibling = value;
+    }
+    
+    [JsonIgnore]
+    public ResNode? Child {
+        get => child;
+        set => child = value;
+    }
+
+    public static ResNode? Expand(List<ResNode> nodeList) {
+        return Expand(nodeList, nodeList.Find(n => n.parentId == 0)?.Id ?? 0);
+    }
+    
+    private static ResNode? Expand(List<ResNode> nodeList, uint id) {
+        
+        var node = GetNode(nodeList, id);
+        
+        if (node != null) {
+            if (node.parentId > 0) node.Parent = GetNode(nodeList, node.parentId);
+            if (node.prevSiblingId > 0) node.PrevSibling = GetNode(nodeList, node.prevSiblingId);
+            if (node.childNodeId > 0) node.Child ??= Expand(nodeList, node.childNodeId);
+            if (node.nextSiblingId > 0) node.NextSibling ??= Expand(nodeList, node.nextSiblingId);
+        }
+        
+        return node;
+    }
+
+    public static List<ResNode> Collapse(ResNode? root, List<ResNode>? list = null) {
+        list ??= new List<ResNode>();
+        if (root == null) return list;
+        root.UpdateRelativeIds();
+        list.Add(root);
+        if (root.Child != null) Collapse(root.Child, list);
+        if (root.NextSibling != null) Collapse(root.NextSibling, list);
+        return list.OrderBy(n => n.Id).ToList();
+    }
+
+    public static ResNode? GetNode(List<ResNode> nodeList, uint node) {
+        return nodeList.Find(n => n.Id == node);
+    }
 
     public NodeType Type;
     public short TabIndex;
@@ -56,16 +130,17 @@ public class ResNode : IEncodable {
     public byte ClipCount;
 
     public ushort TimelineId;
+    
 
     public virtual long Size => 88;
     
     public virtual byte[] Encode() {
         var b = new BufferWriter();
-        b.Write(NodeId);
-        b.Write(ParentId);
-        b.Write(NextSiblingId);
-        b.Write(PrevSiblingId);
-        b.Write(ChildNodeId);
+        b.Write(Id);
+        b.Write(parentId);
+        b.Write(nextSiblingId);
+        b.Write(prevSiblingId);
+        b.Write(childNodeId);
         b.Write((int)Type);
         if (Size > ushort.MaxValue) throw new Exception("Node is too large to encode");
         b.Write((ushort)Size);
@@ -108,11 +183,11 @@ public class ResNode : IEncodable {
 
     public virtual void Decode(ULD baseUld, BufferReader reader) {
         Logging.IndentLog($"Decoding {GetType()}");
-        NodeId = reader.ReadUInt32();
-        ParentId = reader.ReadInt32();
-        NextSiblingId = reader.ReadInt32();
-        PrevSiblingId = reader.ReadInt32();
-        ChildNodeId = reader.ReadInt32();
+        Id = reader.ReadUInt32();
+        parentId = reader.ReadUInt32();
+        nextSiblingId = reader.ReadUInt32();
+        prevSiblingId = reader.ReadUInt32();
+        childNodeId = reader.ReadUInt32();
         Type = (NodeType) reader.ReadInt32();
         reader.ReadUInt16(); // Size
         TabIndex = reader.ReadInt16();
@@ -188,6 +263,4 @@ public class ResNode : IEncodable {
         
         return node;
     }
-    
-    
 }

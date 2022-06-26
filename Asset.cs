@@ -4,13 +4,20 @@ using Newtonsoft.Json;
 namespace ULD;
 
 [JsonObject(MemberSerialization.OptIn)]
-public class Asset : IVersionedEncodable {
-    
+public class Asset : ListElement {
+
+    private string path = string.Empty;
+
     [JsonProperty]
-    public uint Id;
-    
-    [JsonProperty]
-    public string Path = string.Empty;
+    public string Path {
+        get => path;
+        set {
+            var sub = value;
+            while (Encoding.UTF8.GetBytes(sub).Length > 44) sub = sub[..^1];
+            path = sub;
+            
+        }
+    }
     
     [JsonProperty]
     public uint Unk1;
@@ -18,7 +25,7 @@ public class Asset : IVersionedEncodable {
     [JsonProperty]
     public uint Unk2;
 
-    public long GetSize(string version) {
+    public override long GetSize(string version) {
         return version switch {
             "0100" => 52,
             "0101" => 56,
@@ -26,7 +33,7 @@ public class Asset : IVersionedEncodable {
         };
     }
 
-    public byte[] Encode(string version) {
+    public override byte[] Encode(string version) {
 
         var data = new BufferWriter();
         data.Write(Id);
@@ -41,7 +48,7 @@ public class Asset : IVersionedEncodable {
         return data.ToArray();
     }
 
-    public void Decode(ULD baseUld, BufferReader reader, string version) {
+    public override void Decode(ULD baseUld, BufferReader reader, string version) {
         Id = reader.ReadUInt32();
         Path = Encoding.UTF8.GetString(reader.ReadBytes(44)).Split('\0')[0];
         Unk1 = reader.ReadUInt32();

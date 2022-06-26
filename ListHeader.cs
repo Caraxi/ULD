@@ -3,22 +3,30 @@ using Newtonsoft.Json;
 namespace ULD;
 
 
-public interface IVersionedEncodable {
-    public byte[] Encode(string version);
-    public void Decode(ULD baseUld, BufferReader reader, string version);
+public abstract class ListElement : IEncodable, IHasID {
+    public abstract byte[] Encode(string version);
+    public byte[] Encode() => Encode(DefaultVersion);
+    public abstract void Decode(ULD baseUld, BufferReader reader, string version);
+    public void Decode(ULD baseUld, BufferReader reader) => Decode(baseUld, reader, DefaultVersion);
 
-    public long GetSize(string version);
+    public abstract long GetSize(string version);
+    public long Size => GetSize(DefaultVersion);
+    protected virtual string DefaultVersion => "0100";
+
+    public uint Id { get; set; }
 }
 
 [JsonObject(MemberSerialization.OptIn)]
-public abstract class ListHeader<T> : Header, IEncodable where T : IVersionedEncodable, new() {
-
+public abstract class ListHeader<T> : Header, IEncodable where T : ListElement, new() {
+    
     [JsonProperty]
     public int Unknown;
 
     [JsonProperty]
-    public List<T> Elements = new();
-    
+    public List<T> Elements { get; set; } = new();
+
+    public Type ElementType => typeof(T);
+
     public uint ElementCount => (uint)Elements.Count;
 
     public override bool ShouldEncode() => Elements.Count > 0;

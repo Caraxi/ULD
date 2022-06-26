@@ -95,12 +95,15 @@ public class BaseComponentNode : ResNode {
             ComponentType.Multipurpose => new MultipurposeComponentNode(),
             ComponentType.Map => new MapComponentNode(),
             ComponentType.Preview => new PreviewComponentNode(),
-            
+            ComponentType.HoldButton => new HoldButtonComponentNode(),
+            ComponentType.CharaCard => new CharaCardComponentNode(),
             _ => throw new Exception($"Component Type {component.Type} is not supported.")
         };
     }
     
 }
+
+public class CharaCardComponentNode : BaseComponentNode { }
 
 public class PreviewComponentNode : BaseComponentNode { }
 

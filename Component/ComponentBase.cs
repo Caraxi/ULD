@@ -1,8 +1,9 @@
+using Newtonsoft.Json;
 using ULD.Node;
 
 namespace ULD.Component;
 
-public class ComponentBase : IVersionedEncodable {
+public class ComponentBase : ListElement {
 
     private bool nodeListDecoded = true;
     private uint encodedNodeListCount = 0;
@@ -12,17 +13,19 @@ public class ComponentBase : IVersionedEncodable {
     
     
     protected virtual int DataCount => 0;
+
     
-    public uint Id;
     public bool ShouldIgnoreInput;
     public bool DragArrow;
     public bool DropArrow;
-    public ComponentType Type;
+    public ComponentType Type = ComponentType.Base;
 
-    public List<ResNode> Nodes = new();
+    // public List<ResNode> Nodes { get; set; } = new();
 
-    public virtual long GetSize(string version) => 16 + DataCount * 4;
-    public long GetTotalSize(string version) => GetSize(version) + (nodeListDecoded ? Nodes.Sum(n => n.Size) : encodedNodeListSize);
+    public ResNode? RootNode;
+    
+    public override long GetSize(string version) => 16 + DataCount * 4;
+    public long GetTotalSize(string version) => GetSize(version) + (nodeListDecoded ? ResNode.Collapse(RootNode).Sum(n => n.Size) : encodedNodeListSize);
     
 
     private uint[]? data;
@@ -37,7 +40,7 @@ public class ComponentBase : IVersionedEncodable {
     
     protected virtual void EncodeData(BufferWriter writer) {}
     
-    public byte[] Encode(string version) {
+    public override byte[] Encode(string version) {
         var writer = new BufferWriter();
         
         writer.Write(Id);
@@ -45,7 +48,10 @@ public class ComponentBase : IVersionedEncodable {
         writer.Write(DragArrow);
         writer.Write(DropArrow);
         writer.Write((byte) Type);
-        writer.Write((uint)Nodes.Count);
+
+        var nodes = ResNode.Collapse(RootNode);
+        
+        writer.Write((uint)nodes.Count);
 
         var vSize = GetSize(version);
         var vTotalSize = GetTotalSize(version);
@@ -58,7 +64,7 @@ public class ComponentBase : IVersionedEncodable {
         foreach(var d in Data) writer.Write(d);
         EncodeData(writer);
         
-        foreach(var node in Nodes) {
+        foreach(var node in nodes) {
             var encodedNode = node.Encode();
             if (encodedNode.Length != node.Size) throw new Exception($"{node.GetType().Name} does not match expected size of {node.Size}. Actual size: {encodedNode.Length}");
             writer.Write(node.Encode());
@@ -75,7 +81,7 @@ public class ComponentBase : IVersionedEncodable {
         
     }
     
-    public void Decode(ULD baseUld, BufferReader br, string version) {
+    public override void Decode(ULD baseUld, BufferReader br, string version) {
         nodeListDecoded = false;
         Logging.IndentLog($"Decoding {GetType().Name} @ {br.BaseStream.Position}");
         var pos = br.BaseStream.Position;
@@ -115,10 +121,17 @@ public class ComponentBase : IVersionedEncodable {
         Logging.IndentLog($"Decoding Node List for {GetType().Name}#{Id} - {encodedNodeListCount} Nodes");
         
         reader.Seek(encodedNodeListPosition);
-        
+
+
+        var nodeList = new List<ResNode>();
         for (var i = 0; i < encodedNodeListCount; i++) {
-            Nodes.Add(ResNode.ReadNode(baseUld, reader));
+            nodeList.Add(ResNode.ReadNode(baseUld, reader));
         }
+
+
+        if (nodeList.Count(n => n.IsRootNode) != 1) throw new Exception($"{GetType().Name}#{Id} does not have exactly one root node");
+        RootNode = ResNode.Expand(nodeList);
+        
         nodeListDecoded = true;
         var totalSize = GetTotalSize(version);
         if (encodedTotalSize != totalSize) throw new Exception($"{GetType().Name} Total Size does not match the expected value. Expected: {totalSize}, Actual: {encodedTotalSize}");
@@ -153,6 +166,8 @@ public class ComponentBase : IVersionedEncodable {
             ComponentType.Map => new MapComponent(),
             ComponentType.Preview => new PreviewComponent(),
             ComponentType.HoldButton => new HoldButtonComponent(),
+            ComponentType.CharaCard => new CharaCardComponent(),
+            
             _ => throw new Exception($"Component Type {type} is not supported.")
         };
     }

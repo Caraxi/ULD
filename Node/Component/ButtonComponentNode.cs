@@ -20,5 +20,4 @@ public class ButtonComponentNode : BaseComponentNode {
 }
 
 public class CheckBoxComponentNode : ButtonComponentNode { }
-
-
+public class HoldButtonComponentNode : ButtonComponentNode { }

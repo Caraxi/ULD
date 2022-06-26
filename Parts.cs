@@ -1,12 +1,11 @@
 namespace ULD;
 
-public class Parts : IVersionedEncodable{
-    public uint Id;
+public class Parts : ListElement {
     public List<Part> SubParts = new();
 
-    public long GetSize(string version) => 12 + SubParts.Sum(sp => sp.Size);
+    public override long GetSize(string version) => 12 + SubParts.Sum(sp => sp.Size);
 
-    public byte[] Encode(string version) {
+    public override byte[] Encode(string version) {
         var data = new BufferWriter();
         data.Write(Id);
         data.Write((uint)SubParts.Count);
@@ -17,7 +16,7 @@ public class Parts : IVersionedEncodable{
         return data.ToArray();
     }
 
-    public void Decode(ULD baseUld, BufferReader reader, string version) {
+    public override void Decode(ULD baseUld, BufferReader reader, string version) {
         Id = reader.ReadUInt32();
         var partCount = reader.ReadUInt32();
         var size = reader.ReadUInt32();

@@ -1,4 +1,6 @@
 using Newtonsoft.Json;
+using ULD.Component;
+using ULD.Node;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace ULD; 
@@ -7,19 +9,18 @@ namespace ULD;
 [JsonObject(MemberSerialization.OptIn)]
 
 public class ULD : Header {
-    [JsonProperty]
-    public ATK? ATK;
-    
-    [JsonProperty]
-    public ATK? ATK2;
+
+    private bool singleAtk = false;
+
+
+    public ATK?[] ATK = new ATK?[2] { new ATK(), new ATK() };
     
     public ULD(BufferReader r) : base(r, "uldh") {
         Decode(r);
     }
 
     public ULD() : base("uldh") {
-        ATK = new ATK();
-        ATK2 = new ATK();
+        
     }
 
 
@@ -41,17 +42,19 @@ public class ULD : Header {
         if (atkOffset != 0) {
             r.Push();
             r.Seek(atkOffset);
-            ATK = new ATK(this, r);
-            ATK.Decode(this, r);
+            ATK[0] = new ATK(this, r);
+            ATK[0]?.Decode(this, r);
             r.Pop();
         }
         
-        if (atk2Offset != 0) {
+        if (atk2Offset != 0 && atk2Offset != atkOffset) {
             r.Push();
             r.Seek(atk2Offset);
-            ATK2 = new ATK(this, r);
-            ATK2.Decode(this, r);
+            ATK[1] = new ATK(this, r);
+            ATK[1]?.Decode(this, r);
             r.Pop();
+        } else {
+            singleAtk = true;
         }
         
         
@@ -62,23 +65,41 @@ public class ULD : Header {
     public BufferWriter Encode() {
         Logging.ZeroIndent();
         Logging.IndentLog("Encoding ULD");
-        var atk = ATK == null ? Array.Empty<byte>() : ATK.Encode();
-        var atk2 = ATK2 == null ? Array.Empty<byte>() : ATK2.Encode();
+        var atk = ATK[0]?.Encode(this, 0) ?? Array.Empty<byte>();
+        var atk2 = ATK[1]?.Encode(this, 1) ?? Array.Empty<byte>();
         var bytes = new BufferWriter();
         bytes.Write("uldh");
         bytes.Write("0100");
-        bytes.Write(ATK == null ? 0U : 16U);
-        bytes.Write(ATK2 == null ? 0U : (uint)(16 + atk.Length));
+        bytes.Write(ATK[0] == null ? 0U : 16U);
+        if (singleAtk) {
+            bytes.Write(ATK[0] == null ? 0U : 16U);
+        } else {
+            bytes.Write(ATK[1] == null ? 0U : (uint)(16 + atk.Length));
+        }
+        
         bytes.Write(atk);
         bytes.Write(atk2);
         Logging.Unindent();
         return bytes;
     }
 
-    public Component.ComponentBase? GetComponent(uint id) {
-        Component.ComponentBase? component = null;
-        if (ATK?.Components != null) component = ATK.Components?.Elements.Find(c => c.Id == id);
-        if (component == null && ATK2?.Components != null) component = ATK2.Components?.Elements.Find(c => c.Id == id);
-        return component;
+    public ComponentBase? GetComponent(uint id) {
+        foreach (var atk in ATK) {
+            var c = atk?.Components?.Elements.Find(c => c.Id == id);
+            if (c != null) return c;
+        }
+        return null;
     }
+    
+    public ComponentBase? GetComponent(NodeType nodeType) => GetComponent((uint) nodeType);
+    
+
+    public Asset? GetAsset(uint id) {
+        foreach (var atk in ATK) {
+            var c = atk?.Assets?.Elements.Find(c => c.Id == id);
+            if (c != null) return c;
+        }
+        return null;
+    }
+    
 }

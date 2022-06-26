@@ -1,16 +1,13 @@
 namespace ULD.Timelines;
 
-public class Timeline : IVersionedEncodable {
-
-    public uint Id;
-
+public class Timeline : ListElement {
     public List<Frame> FrameSet0 = new();
     public List<Frame> FrameSet1 = new();
 
-    public long GetSize(string version) => 12 + FrameSet0.Sum(fs => fs.Size) + FrameSet1.Sum(fs => fs.Size);
+    public override long GetSize(string version) => 12 + FrameSet0.Sum(fs => fs.Size) + FrameSet1.Sum(fs => fs.Size);
     
     
-    public byte[] Encode(string version) {
+    public override byte[] Encode(string version) {
         var data = new BufferWriter();
         data.Write(Id);
         var vSize = GetSize(version);
@@ -23,7 +20,7 @@ public class Timeline : IVersionedEncodable {
         return data.ToArray();
     }
 
-    public void Decode(ULD baseUld, BufferReader reader, string version) {
+    public override void Decode(ULD baseUld, BufferReader reader, string version) {
         Logging.IndentLog($"Decoding Timeline @ {reader.BaseStream.Position}");
         Id = reader.ReadUInt32();
         Logging.Log(" - ID: " + Id);
