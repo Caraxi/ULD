@@ -20,10 +20,18 @@ public class Asset : ListElement {
     }
     
     [JsonProperty]
-    public uint Unk1;
+    public uint IconId;
+    
+    
+    [Flags]
+    public enum AssetThemes : uint {
+        None = 0,
+        Light = 1,
+        Classic = 2,
+    }
     
     [JsonProperty]
-    public uint Unk2;
+    public AssetThemes Themes;
 
     public override long GetSize(string version) {
         return version switch {
@@ -39,10 +47,9 @@ public class Asset : ListElement {
         data.Write(Id);
         data.Write(Path);
         while(data.Length < 48) data.Write((byte)0);
-        data.Write(Unk1);
+        data.Write(IconId);
         if (version == "0101") {
-            
-            data.Write(Unk2);
+            data.Write((uint)Themes);
         }
         
         return data.ToArray();
@@ -51,10 +58,9 @@ public class Asset : ListElement {
     public override void Decode(ULD baseUld, BufferReader reader, string version) {
         Id = reader.ReadUInt32();
         Path = Encoding.UTF8.GetString(reader.ReadBytes(44)).Split('\0')[0];
-        Unk1 = reader.ReadUInt32();
+        IconId = reader.ReadUInt32();
         if (version == "0101") {
-            
-            Unk2 = reader.ReadUInt32();
+            Themes = (AssetThemes) reader.ReadUInt32();
         }
     }
 }
