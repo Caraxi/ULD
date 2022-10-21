@@ -9,6 +9,12 @@ public enum FontType : byte {
     JupiterLarge = 0x5,
 }
 
+public enum TextAlignment : ushort {
+    TopLeft,    TopMiddle,    TopRight,
+    MiddleLeft, Center,       MiddleRight,
+    BottomLeft, BottomMiddle, BottomRight,
+}
+
 public enum SheetType : byte {
     Addon = 0x0,
     Lobby = 0x1,
@@ -17,7 +23,7 @@ public enum SheetType : byte {
 public class TextNode : ResNode {
     public uint TextId;
     public uint Color;
-    public ushort Alignment;
+    public TextAlignment Alignment;
     public FontType Font;
     public byte FontSize;
     public uint EdgeColor;
@@ -46,7 +52,7 @@ public class TextNode : ResNode {
         b.Write(base.Encode());
         b.Write(TextId);
         b.Write(Color);
-        b.Write(Alignment);
+        b.Write((ushort)Alignment);
         b.Write((byte) Font);
         b.Write(FontSize);
         b.Write(EdgeColor);
@@ -74,7 +80,7 @@ public class TextNode : ResNode {
         base.Decode(baseUld, reader);
         TextId = reader.ReadUInt32();
         Color = reader.ReadUInt32();
-        Alignment = reader.ReadUInt16();
+        Alignment = (TextAlignment)reader.ReadUInt16();
         Font = (FontType)reader.ReadByte();
         FontSize = reader.ReadByte();
         EdgeColor = reader.ReadUInt32();
