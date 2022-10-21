@@ -36,7 +36,7 @@ public class Widget : ListElement {
         return b.ToArray();
     }
 
-    public override void Decode(ULD baseUld, BufferReader reader, string version) {
+    public override void Decode(Uld baseUld, BufferReader reader, string version) {
         Id = reader.ReadUInt32();
         AlignmentType = (AlignmentType)reader.ReadInt32();
         X = reader.ReadInt16();

@@ -4,9 +4,9 @@ namespace ULD;
 
 public class Header {
     protected string Type;
-    protected string Version { get; set; } = "0100";
+    public string Version { get; set; } = "0100";
     
-    protected ULD? BaseULD;
+    protected Uld? BaseULD;
     protected long BaseOffset;
 
     public virtual bool ShouldEncode() => true;
@@ -18,8 +18,8 @@ public class Header {
     
     protected Header(BufferReader? r, string? expectedType = null) : this(null, r, expectedType) { }
 
-    protected Header(ULD? baseUld, BufferReader? r, string? expectedType = null) {
-        if (this is ULD uld && baseUld == null) baseUld = uld;
+    protected Header(Uld? baseUld, BufferReader? r, string? expectedType = null) {
+        if (this is Uld uld && baseUld == null) baseUld = uld;
         BaseULD = baseUld ?? throw new Exception("No base ULD provided");
         if (r != null) BaseOffset = r.BaseStream.Position;
         Type = Encoding.UTF8.GetString(r.ReadBytes(4));

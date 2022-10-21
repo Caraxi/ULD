@@ -5,7 +5,7 @@ public class RadioButtonComponentNode : ButtonComponentNode {
 
     public override long Size => base.Size + 4;
 
-    public override void Decode(ULD baseUld, BufferReader reader) {
+    public override void Decode(Uld baseUld, BufferReader reader) {
         base.Decode(baseUld, reader);
         GroupId = reader.ReadUInt32();
     }

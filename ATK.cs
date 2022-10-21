@@ -1,44 +1,42 @@
-using Newtonsoft.Json;
+
 using ULD.Node;
 using ULD.Node.Component;
 
 namespace ULD; 
 
-
-[JsonObject(MemberSerialization.OptIn)]
 public class ATK : Header {
     
     
-    [JsonProperty]
+    
     public AssetList? Assets;
 
-    [JsonProperty]
+    
     public PartList? Parts;
     
-    [JsonProperty]
+    
     public ComponentList? Components;
     
-    [JsonProperty]
+    
     public TimelineList? Timelines;
 
-    [JsonProperty]
+    
     public WidgetList? Widgets;
     
-    [JsonProperty]
+    
     public uint RewriteDataOffset;
 
-    [JsonProperty] 
+     
     public uint NodesWithTimeline;
     
     public ATK() : base("atkh") {
         
     }
 
-    public ATK(ULD uld, BufferReader r) : base(uld, r, "atkh") {
+    public ATK(Uld uld, BufferReader r) : base(uld, r, "atkh") {
         
     }
 
-    public void Decode(ULD uld, BufferReader r) {
+    public void Decode(Uld uld, BufferReader r) {
         Logging.IndentLog($"Decoding ATK @ {r.BaseStream.Position}");
         var assetListOffset = r.ReadUInt32();
         if (assetListOffset != 0) {
@@ -93,7 +91,7 @@ public class ATK : Header {
     }
     
     
-    public byte[] Encode(ULD uld, byte id) {
+    public byte[] Encode(Uld uld, byte id) {
         var bytes = new BufferWriter();
         Logging.IndentLog("Encoding ATK");
         
@@ -166,7 +164,7 @@ public class ATK : Header {
         return bytes.ToArray();
     }
 
-    private uint CountNodesWithTimeline(ULD uld, ResNode? rootNode) {
+    private uint CountNodesWithTimeline(Uld uld, ResNode? rootNode) {
         if (rootNode == null) return 0U;
         var n = 0U;
         

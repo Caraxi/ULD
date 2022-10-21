@@ -28,7 +28,7 @@ public class TextInputComponentNode : BaseComponentNode {
 
     public override long Size => base.Size + 36;
 
-    public override void Decode(ULD baseUld, BufferReader reader) {
+    public override void Decode(Uld baseUld, BufferReader reader) {
         base.Decode(baseUld, reader);
 
         MaxWidth = reader.ReadUInt32();

@@ -59,11 +59,11 @@ public class ComponentBase : ListElement {
         return writer.ToArray();
     }
 
-    protected virtual void DecodeData(ULD baseUld, BufferReader br) {
+    protected virtual void DecodeData(Uld baseUld, BufferReader br) {
         
     }
     
-    public override void Decode(ULD baseUld, BufferReader br, string version) {
+    public override void Decode(Uld baseUld, BufferReader br, string version) {
         nodeListDecoded = false;
         Logging.IndentLog($"Decoding {GetType().Name} @ {br.BaseStream.Position}");
         var pos = br.BaseStream.Position;
@@ -92,11 +92,11 @@ public class ComponentBase : ListElement {
         Logging.Unindent();
     }
 
-    protected virtual void DecodeNodeList(ULD baseUld, BufferReader reader, string version, List<ResNode> nodes) {
+    protected virtual void DecodeNodeList(Uld baseUld, BufferReader reader, string version, List<ResNode> nodes) {
         
     }
     
-    public void DecodeNodeList(ULD baseUld, BufferReader reader, string version) {
+    public void DecodeNodeList(Uld baseUld, BufferReader reader, string version) {
         if (nodeListDecoded) return;
         
         Logging.IndentLog($"Decoding Node List for {GetType().Name}#{Id} - {encodedNodeListCount} Nodes");

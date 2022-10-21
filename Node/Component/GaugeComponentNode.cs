@@ -8,7 +8,7 @@ public class GaugeComponentNode : BaseComponentNode {
 
     public override long Size => base.Size + 16;
 
-    public override void Decode(ULD baseUld, BufferReader reader) {
+    public override void Decode(Uld baseUld, BufferReader reader) {
         base.Decode(baseUld, reader);
         Indicator = reader.ReadInt32();
         Min = reader.ReadInt32();

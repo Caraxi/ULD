@@ -1,13 +1,11 @@
-using Newtonsoft.Json;
-
 namespace ULD;
 
 
 public abstract class ListElement : IEncodable, IHasID {
     public abstract byte[] Encode(string version);
     public byte[] Encode() => Encode(DefaultVersion);
-    public abstract void Decode(ULD baseUld, BufferReader reader, string version);
-    public void Decode(ULD baseUld, BufferReader reader) => Decode(baseUld, reader, DefaultVersion);
+    public abstract void Decode(Uld baseUld, BufferReader reader, string version);
+    public void Decode(Uld baseUld, BufferReader reader) => Decode(baseUld, reader, DefaultVersion);
 
     public abstract long GetSize(string version);
     public long Size => GetSize(DefaultVersion);
@@ -16,13 +14,12 @@ public abstract class ListElement : IEncodable, IHasID {
     public uint Id { get; set; }
 }
 
-[JsonObject(MemberSerialization.OptIn)]
 public abstract class ListHeader<T> : Header, IEncodable where T : ListElement, new() {
     
-    [JsonProperty]
+    
     public int Unknown;
 
-    [JsonProperty]
+    
     public List<T> Elements { get; set; } = new();
 
     public Type ElementType => typeof(T);
@@ -39,15 +36,15 @@ public abstract class ListHeader<T> : Header, IEncodable where T : ListElement, 
     
     protected ListHeader(string name) : base(name) { }
 
-    protected ListHeader(ULD baseUld, BufferReader r, string headerType) : base(baseUld, r, headerType) {
+    protected ListHeader(Uld baseUld, BufferReader r, string headerType) : base(baseUld, r, headerType) {
         
     }
 
-    protected virtual T CreateElementObject(ULD baseUld, BufferReader r) {
+    protected virtual T CreateElementObject(Uld baseUld, BufferReader r) {
         return new T();
     }
     
-    public void Decode(ULD baseUld, BufferReader r) {
+    public void Decode(Uld baseUld, BufferReader r) {
         
         Logging.IndentLog($"Decoding {GetType().Name} @ {BaseOffset}");
         
@@ -72,7 +69,7 @@ public abstract class ListHeader<T> : Header, IEncodable where T : ListElement, 
 
     public virtual long Size => Elements.Sum(e => e.GetSize(Version));
 
-    protected virtual void AfterDecode(ULD baseUld, BufferReader reader) {}
+    protected virtual void AfterDecode(Uld baseUld, BufferReader reader) {}
     
 
     public byte[] Encode() {

@@ -27,6 +27,8 @@ public class NineGridNode : ResNode {
 
     public override long Size => base.Size + 20;
 
+    public override NodeType Type => NodeType.NineGrid;
+
     public override byte[] Encode() {
         var b = new BufferWriter();
         b.Write(base.Encode());
@@ -43,7 +45,7 @@ public class NineGridNode : ResNode {
         return b;
     }
 
-    public override void Decode(ULD baseUld, BufferReader reader) {
+    public override void Decode(Uld baseUld, BufferReader reader) {
         base.Decode(baseUld, reader);
         PartListId = reader.ReadUInt32();
         PartId = reader.ReadUInt32();

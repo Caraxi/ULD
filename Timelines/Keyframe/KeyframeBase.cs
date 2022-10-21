@@ -26,7 +26,7 @@ public abstract class KeyframeBase : IEncodable {
 
     protected abstract void EncodeKeyframeData(BufferWriter b);
     
-    public void Decode(ULD baseUld, BufferReader reader) {
+    public void Decode(Uld baseUld, BufferReader reader) {
         Time = reader.ReadUInt32();
         var size = reader.ReadUInt16();
         Interpolation = reader.ReadByte();

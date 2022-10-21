@@ -21,7 +21,7 @@ public class Frame : IEncodable {
         return b.ToArray();
     }
 
-    public void Decode(ULD baseUld, BufferReader reader) {
+    public void Decode(Uld baseUld, BufferReader reader) {
         Logging.IndentLog("Decoding Frame");
         StartFrame = reader.ReadUInt32();
         EndFrame = reader.ReadUInt32();

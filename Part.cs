@@ -19,7 +19,7 @@ public class Part : IEncodable {
         return data.ToArray();
     }
 
-    public void Decode(ULD baseUld, BufferReader reader) {
+    public void Decode(Uld baseUld, BufferReader reader) {
         TextureId = reader.ReadUInt32();
         U = reader.ReadUInt16();
         V = reader.ReadUInt16();

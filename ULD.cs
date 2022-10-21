@@ -1,36 +1,30 @@
-using Newtonsoft.Json;
+
 using ULD.Component;
 using ULD.Node;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace ULD; 
 
-
-[JsonObject(MemberSerialization.OptIn)]
-
-public class ULD : Header {
+public class Uld : Header {
 
     private bool singleAtk = false;
 
 
     public ATK?[] ATK = new ATK?[2] { new ATK(), new ATK() };
+
+
+    public AssetList? Assets => ATK[0]?.Assets ?? ATK[1]?.Assets ?? null;
+    public PartList? Parts => ATK[0]?.Parts ?? ATK[1]?.Parts ?? null;
+    public ComponentList? Components => ATK[0]?.Components ?? ATK[1]?.Components ?? null;
+    public TimelineList? Timelines => ATK[0]?.Timelines ?? ATK[1]?.Timelines ?? null;
+    public WidgetList? Widgets => ATK[1]?.Widgets ?? ATK[0]?.Widgets ?? null;
     
-    public ULD(BufferReader r) : base(r, "uldh") {
+    public Uld(BufferReader r) : base(r, "uldh") {
         Decode(r);
     }
 
-    public ULD() : base("uldh") {
+    public Uld() : base("uldh") {
         
-    }
-
-
-    public string ToJson(Formatting formatting = Formatting.Indented, JsonSerializerSettings? settings = null) {
-        settings ??= new JsonSerializerSettings() {
-            TypeNameHandling = TypeNameHandling.All,
-            TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple
-        };
-
-        return JsonConvert.SerializeObject(this, Formatting.Indented, settings);
     }
     
     public void Decode(BufferReader r) {

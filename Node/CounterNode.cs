@@ -11,6 +11,8 @@ public class CounterNode : ResNode {
     
     public override long Size => base.Size + 12;
 
+    public override NodeType Type => NodeType.Counter;
+
     public override byte[] Encode() {
         var b = new BufferWriter();
         b.Write(base.Encode());
@@ -24,7 +26,7 @@ public class CounterNode : ResNode {
         return b;
     }
 
-    public override void Decode(ULD baseUld, BufferReader reader) {
+    public override void Decode(Uld baseUld, BufferReader reader) {
         base.Decode(baseUld, reader);
         PartListId = reader.ReadUInt32();
         PartId = reader.ReadByte();

@@ -55,7 +55,7 @@ public class KeyGroup : IEncodable {
     public long Size => 8 + Keyframes.Sum(kf => kf.Size);
     
     
-    protected ULD BaseULD;
+    protected Uld BaseULD;
 
     public byte[] Encode() {
         var b = new BufferWriter();
@@ -83,7 +83,7 @@ public class KeyGroup : IEncodable {
         return keyframes;
     }
     
-    public void Decode(ULD baseUld, BufferReader reader) {
+    public void Decode(Uld baseUld, BufferReader reader) {
         Logging.IndentLog("Decoding KeyGroup");
         BaseULD = baseUld;
         Usage = (KeyUsage)reader.ReadUInt16();

@@ -20,7 +20,7 @@ public class Timeline : ListElement {
         return data.ToArray();
     }
 
-    public override void Decode(ULD baseUld, BufferReader reader, string version) {
+    public override void Decode(Uld baseUld, BufferReader reader, string version) {
         Logging.IndentLog($"Decoding Timeline @ {reader.BaseStream.Position}");
         Id = reader.ReadUInt32();
         Logging.Log(" - ID: " + Id);

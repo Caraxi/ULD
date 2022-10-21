@@ -9,12 +9,12 @@ public class CheckBoxComponent : ButtonComponent {
     public override long GetSize(string version) => base.GetSize(version) + 4;
 
 
-    protected override void DecodeData(ULD baseUld, BufferReader br) {
+    protected override void DecodeData(Uld baseUld, BufferReader br) {
         base.DecodeData(baseUld, br);
         unkNodeId = br.ReadUInt32();
     }
 
-    protected override void DecodeNodeList(ULD baseUld, BufferReader reader, string version, List<ResNode> nodes) {
+    protected override void DecodeNodeList(Uld baseUld, BufferReader reader, string version, List<ResNode> nodes) {
         base.DecodeNodeList(baseUld, reader, version, nodes);
         
     }

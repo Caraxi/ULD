@@ -1,14 +1,12 @@
 using System.Text;
-using Newtonsoft.Json;
 
 namespace ULD;
 
-[JsonObject(MemberSerialization.OptIn)]
 public class Asset : ListElement {
 
     private string path = string.Empty;
 
-    [JsonProperty]
+    
     public string Path {
         get => path;
         set {
@@ -19,7 +17,7 @@ public class Asset : ListElement {
         }
     }
     
-    [JsonProperty]
+    
     public uint IconId;
     
     
@@ -30,7 +28,7 @@ public class Asset : ListElement {
         Classic = 2,
     }
     
-    [JsonProperty]
+    
     public AssetThemes Themes;
 
     public override long GetSize(string version) {
@@ -55,7 +53,7 @@ public class Asset : ListElement {
         return data.ToArray();
     }
 
-    public override void Decode(ULD baseUld, BufferReader reader, string version) {
+    public override void Decode(Uld baseUld, BufferReader reader, string version) {
         Id = reader.ReadUInt32();
         Path = Encoding.UTF8.GetString(reader.ReadBytes(44)).Split('\0')[0];
         IconId = reader.ReadUInt32();

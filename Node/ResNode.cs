@@ -1,4 +1,3 @@
-using Newtonsoft.Json;
 using ULD.Node.Component;
 
 namespace ULD.Node; 
@@ -30,7 +29,7 @@ public class ResNode : IEncodable, IHasID {
         childNodeId = Child?.Id ?? 0;
     }
     
-    [JsonIgnore] 
+     
     public bool IsRootNode => parentId == 0;
 
     
@@ -39,25 +38,25 @@ public class ResNode : IEncodable, IHasID {
     private ResNode? prevSibling;
     private ResNode? child;
     
-    [JsonIgnore]
+    
     public ResNode? Parent {
         get => parent;
         set => parent = value;
     }
 
-    [JsonIgnore]
+    
     public ResNode? NextSibling {
         get => nextSibling;
         set => nextSibling = value;
     }
     
-    [JsonIgnore]
+    
     public ResNode? PrevSibling {
         get => prevSibling;
         set => prevSibling = value;
     }
     
-    [JsonIgnore]
+    
     public ResNode? Child {
         get => child;
         set => child = value;
@@ -95,7 +94,7 @@ public class ResNode : IEncodable, IHasID {
         return nodeList.Find(n => n.Id == node);
     }
 
-    public NodeType Type;
+    public virtual NodeType Type => NodeType.Res;
     public short TabIndex;
     public int[] Unk1 = new int[4];
     public short X;
@@ -103,8 +102,8 @@ public class ResNode : IEncodable, IHasID {
     public ushort W;
     public ushort H;
     public float Rotation;
-    public float ScaleX;
-    public float ScaleY;
+    public float ScaleX = 1;
+    public float ScaleY = 1;
     public short OriginX;
     public short OriginY;
     public ushort Priority;
@@ -181,14 +180,15 @@ public class ResNode : IEncodable, IHasID {
         return b;
     }
 
-    public virtual void Decode(ULD baseUld, BufferReader reader) {
+    public virtual void Decode(Uld baseUld, BufferReader reader) {
         Logging.IndentLog($"Decoding {GetType()}");
         Id = reader.ReadUInt32();
         parentId = reader.ReadUInt32();
         nextSiblingId = reader.ReadUInt32();
         prevSiblingId = reader.ReadUInt32();
         childNodeId = reader.ReadUInt32();
-        Type = (NodeType) reader.ReadInt32();
+        var type = (NodeType)reader.ReadUInt32();
+        if (type != Type) throw new Exception($"Incorrect Node Type - Expected [{Type}] but got [{type}]");
         reader.ReadUInt16(); // Size
         TabIndex = reader.ReadInt16();
         Unk1 = new[] {
@@ -229,7 +229,7 @@ public class ResNode : IEncodable, IHasID {
         Logging.Unindent();
     }
 
-    public static ResNode ReadNode(ULD baseUld, BufferReader reader) {
+    public static ResNode ReadNode(Uld baseUld, BufferReader reader) {
         
         var pos = reader.BaseStream.Position;
         

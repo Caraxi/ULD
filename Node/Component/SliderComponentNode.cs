@@ -7,7 +7,7 @@ public class SliderComponentNode : BaseComponentNode {
 
     public override long Size => base.Size + 12;
 
-    public override void Decode(ULD baseUld, BufferReader reader) {
+    public override void Decode(Uld baseUld, BufferReader reader) {
         base.Decode(baseUld, reader);
         Min = reader.ReadInt32();
         Max = reader.ReadInt32();

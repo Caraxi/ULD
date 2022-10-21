@@ -6,7 +6,7 @@ public class ListItemComponentNode : BaseComponentNode {
     
     public override long Size => base.Size + 4;
 
-    public override void Decode(ULD baseUld, BufferReader reader) {
+    public override void Decode(Uld baseUld, BufferReader reader) {
         base.Decode(baseUld, reader);
         Toggle = reader.ReadBoolean();
         Unknown = reader.ReadBytes(3);

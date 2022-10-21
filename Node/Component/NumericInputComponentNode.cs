@@ -12,7 +12,7 @@ public class NumericInputComponentNode : BaseComponentNode {
 
     public override long Size => base.Size + 24;
 
-    public override void Decode(ULD baseUld, BufferReader reader) {
+    public override void Decode(Uld baseUld, BufferReader reader) {
         base.Decode(baseUld, reader);
         Value = reader.ReadInt32();
         Max = reader.ReadInt32();

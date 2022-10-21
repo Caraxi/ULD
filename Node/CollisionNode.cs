@@ -17,6 +17,8 @@ public class CollisionNode : ResNode {
 
     public override long Size => base.Size + 16;
 
+    public override NodeType Type => NodeType.Collision;
+
     public override byte[] Encode() {
         var b = new BufferWriter();
         b.Write(base.Encode());
@@ -28,7 +30,7 @@ public class CollisionNode : ResNode {
         return b;
     }
 
-    public override void Decode(ULD baseUld, BufferReader reader) {
+    public override void Decode(Uld baseUld, BufferReader reader) {
         base.Decode(baseUld, reader);
         CollisionType = (CollisionType)reader.ReadUInt16();
         Unk3 = reader.ReadUInt16();

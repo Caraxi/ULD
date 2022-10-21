@@ -16,7 +16,7 @@ public class Parts : ListElement {
         return data.ToArray();
     }
 
-    public override void Decode(ULD baseUld, BufferReader reader, string version) {
+    public override void Decode(Uld baseUld, BufferReader reader, string version) {
         Id = reader.ReadUInt32();
         var partCount = reader.ReadUInt32();
         var size = reader.ReadUInt32();

@@ -24,7 +24,11 @@ public class BaseComponentNode : ResNode {
 
     public override long Size => base.Size + 12;
 
-    public override void Decode(ULD baseUld, BufferReader reader) {
+    public ComponentBase? Component { get; set; }
+    
+    public override NodeType Type => (NodeType) (Component?.Id ?? 0);
+
+    public override void Decode(Uld baseUld, BufferReader reader) {
         base.Decode(baseUld, reader);
         Index = reader.ReadByte();
         Up = reader.ReadByte();
@@ -67,10 +71,10 @@ public class BaseComponentNode : ResNode {
         return b;
     }
     
-    public static BaseComponentNode Create(ULD baseUld, uint componentId) {
+    public static BaseComponentNode Create(Uld baseUld, uint componentId) {
         var component = baseUld.GetComponent(componentId);
         if (component == null) throw new Exception($"Component#{componentId} is not defined in ULD, but was referenced in a component node.");
-        return component.Type switch {
+        var componentNode = component.Type switch {
             ComponentType.Base => new BaseComponentNode(),
             ComponentType.Button => new ButtonComponentNode(),
             ComponentType.Window => new WindowComponentNode(),
@@ -99,6 +103,8 @@ public class BaseComponentNode : ResNode {
             ComponentType.CharaCard => new CharaCardComponentNode(),
             _ => throw new Exception($"Component Type {component.Type} is not supported.")
         };
+        componentNode.Component = component;
+        return componentNode;
     }
     
 }

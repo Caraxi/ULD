@@ -6,7 +6,7 @@ public class ListComponentNode : BaseComponentNode {
 
     public override long Size => base.Size + 4;
 
-    public override void Decode(ULD baseUld, BufferReader reader) {
+    public override void Decode(Uld baseUld, BufferReader reader) {
         base.Decode(baseUld, reader);
         RowNum = reader.ReadUInt16();
         ColumnNum = reader.ReadUInt16();

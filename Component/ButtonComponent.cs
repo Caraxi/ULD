@@ -13,13 +13,13 @@ public class ButtonComponent : ComponentBase {
     public override long GetSize(string version) => base.GetSize(version) + 8;
 
 
-    protected override void DecodeData(ULD baseUld, BufferReader br) {
+    protected override void DecodeData(Uld baseUld, BufferReader br) {
         base.DecodeData(baseUld, br);
         buttonContentNodeId = br.ReadUInt32();
         buttonBackgroundImageNodeId = br.ReadUInt32();
     }
 
-    protected override void DecodeNodeList(ULD baseUld, BufferReader reader, string version, List<ResNode> nodes) {
+    protected override void DecodeNodeList(Uld baseUld, BufferReader reader, string version, List<ResNode> nodes) {
         ButtonContentNode = buttonContentNodeId == 0 ? null : nodes.Find(n => n.Id == buttonContentNodeId);
         ButtonBackgroundImageNode = buttonBackgroundImageNodeId == 0 ? null : nodes.Find(n => n.Id == buttonBackgroundImageNodeId);
     }

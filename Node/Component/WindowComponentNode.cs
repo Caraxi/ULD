@@ -10,7 +10,7 @@ public class WindowComponentNode : BaseComponentNode {
 
     public override long Size => base.Size + 12;
 
-    public override void Decode(ULD baseUld, BufferReader reader) {
+    public override void Decode(Uld baseUld, BufferReader reader) {
         base.Decode(baseUld, reader);
         TitleTextId = reader.ReadUInt32();
         SubtitleTextId = reader.ReadUInt32();
